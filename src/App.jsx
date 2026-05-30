@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
@@ -75,11 +75,11 @@ const AppShell = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
 
-          
+
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
 
-       
+
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
@@ -87,14 +87,25 @@ const AppShell = () => {
   );
 };
 
-const App = () => (
-  <AuthProvider>
-    <PitchProvider>
-      <Router>
-        <AppShell />
-      </Router>
-    </PitchProvider>
-  </AuthProvider>
-);
+const App = () => {
+  useEffect(() => {
+    // Wake up backend when user visits (especially useful for free hosting tiers)
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    fetch(`${apiUrl}/api/health`)
+      .then(res => res.json())
+      .then(data => console.log("Backend wake-up status:", data.status))
+      .catch(err => console.log("Waking up backend..."));
+  }, []);
+
+  return (
+    <AuthProvider>
+      <PitchProvider>
+        <Router>
+          <AppShell />
+        </Router>
+      </PitchProvider>
+    </AuthProvider>
+  );
+};
 
 export default App;

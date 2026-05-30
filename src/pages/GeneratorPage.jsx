@@ -8,7 +8,7 @@ import BrandLogo from '../components/Layout/BrandLogo';
 import './GeneratorPage.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL;
-const API = `${API_BASE_URL}/pitch/cold-mail`;
+const API = `${API_BASE_URL}/api/pitch/cold-mail`;
 
 const MailIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">

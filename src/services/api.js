@@ -29,13 +29,13 @@ api.interceptors.response.use(
 
 
 export const pitchAPI = {
-  generate: (payload) => api.post("/pitch/generate", payload),
-  getHistory: () => api.get("/pitch/history"),
-  deleteHistory: (id) => api.delete(`/pitch/history/${id}`),
+  generate: (payload) => api.post("/api/pitch/generate", payload),
+  getHistory: () => api.get("/api/pitch/history"),
+  deleteHistory: (id) => api.delete(`/api/pitch/history/${id}`),
 };
 
 export const linkedInAPI = {
-  optimize: (payload) => api.post("/linkedin/optimize", payload),
+  optimize: (payload) => api.post("/api/linkedin/optimize", payload),
 };
 
 export default api;
