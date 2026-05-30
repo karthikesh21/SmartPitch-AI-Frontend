@@ -1,0 +1,64 @@
+.bg-glow {
+  position: relative;
+  border-radius: var(--br, 28px);
+  padding: 1.5px;
+  background:
+    conic-gradient(
+      from 0deg at var(--gx, 50%) var(--gy, 50%),
+      var(--c1, #c084fc),
+      var(--c2, #f472b6),
+      var(--c3, #38bdf8),
+      var(--c1, #c084fc)
+    );
+  /* The trick: multiply the border opacity by --gi */
+  --_o: var(--gi, 0);
+}
+
+/* Transparency mask: inner content blocks out the gradient, showing only border */
+.bg-glow::before {
+  content: '';
+  position: absolute;
+  inset: 1.5px;
+  border-radius: calc(var(--br, 28px) - 1.5px);
+  background: var(--bg, #060010);
+  z-index: 0;
+}
+
+/* Glow bloom behind the card */
+.bg-glow::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: radial-gradient(
+    calc(var(--gr, 40px) * 3) circle at var(--gx, 50%) var(--gy, 50%),
+    rgba(192, 132, 252, calc(var(--gi, 0) * 0.35)),
+    transparent 70%
+  );
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Dim the gradient when gi is 0 */
+.bg-glow {
+  filter: opacity(calc(0.08 + var(--gi, 0) * 0.92));
+  /* Actually we want card always visible; use outline trick instead */
+}
+/* Correction — card always visible, only border brightens */
+.bg-glow {
+  filter: none;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
+  transition: box-shadow 0.2s;
+}
+.bg-glow:hover {
+  box-shadow: 0 0 0 1px rgba(192,132,252,calc(var(--gi,0)*0.8));
+}
+
+.bg-glow__inner {
+  position: relative;
+  z-index: 1;
+  border-radius: calc(var(--br, 28px) - 1.5px);
+  background: var(--bg, #060010);
+  height: 100%;
+  overflow: hidden;
+}

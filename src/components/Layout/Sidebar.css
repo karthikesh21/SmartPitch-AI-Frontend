@@ -1,0 +1,47 @@
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 80px;
+  bottom: 0;
+  width: 240px;
+  background: var(--dark-card);
+  border-right: 1px solid var(--dark-border);
+  padding: 1rem;
+  transition: width var(--transition-base);
+  z-index: var(--z-dropdown);
+}
+
+.sidebar--collapsed {
+  width: 72px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: var(--dark-text-muted);
+  text-decoration: none;
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-base);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar-link:hover,
+.sidebar-link--active {
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-link--active {
+  color: var(--accent-400);
+  background: rgba(var(--glow-purple), 0.1);
+}
