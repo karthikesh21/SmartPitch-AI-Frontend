@@ -54,9 +54,8 @@ const Robot = () => (
 
 const Loader = ({ out }) => (
   <div className={`nb-loader${out ? ' nb-loader--out' : ''}`}>
-    <div className="nb-loader__bot">
-      <div className="nb-loader__head"><div className="nb-loader__eye" /><div className="nb-loader__eye" /></div>
-      <div className="nb-loader__body" />
+    <div style={{ width: '220px', height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <InteractiveRobot3D />
     </div>
     <p>SmartPitch AI warming up…</p>
   </div>
@@ -72,9 +71,7 @@ const HomeNavbar = ({ navigate, isLoggedIn, logout }) => (
         <li><a href="#features">Features</a></li>
         <li><a href="#how-it-works">How It Works</a></li>
         <li>
-          <button className="nb-nav__gen-link" onClick={() => navigate(isLoggedIn ? '/generator' : '/login')}>
-            AI Pitch Generator
-          </button>
+
         </li>
       </ul>
       <div className="nb-nav__acts">
@@ -268,7 +265,6 @@ const Footer = ({ navigate }) => (
       <div className="nb-footer__links">
         <div><strong>Product</strong><a href="#features">Features</a><button className="nb-footer__link-btn" onClick={() => navigate('/generator')}>Generator</button></div>
         <div><strong>Company</strong><a href="#about">About</a><a href="mailto:karthikes004h@gmail.com">Contact</a></div>
-        <div><strong>Legal</strong><a href="#privacy">Privacy</a><a href="#terms">Terms</a></div>
       </div>
     </div>
     <div className="nb-footer__bottom"><p>© 2026 SmartPitchAI. All rights reserved.</p></div>
