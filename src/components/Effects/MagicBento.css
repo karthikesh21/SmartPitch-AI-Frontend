@@ -129,6 +129,17 @@
   transform: translateY(0);
 }
 
+@media (max-width: 768px) {
+  .card-grid {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  .magic-bento-card--text-autohide .magic-bento-card__description {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 .particle-container {
   position: relative;
 }
