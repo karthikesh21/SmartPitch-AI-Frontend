@@ -108,4 +108,15 @@ const App = () => {
   );
 };
 
+  return (
+    <AuthProvider>
+      <PitchProvider>
+        <Router>
+          <AppShell />
+        </Router>
+      </PitchProvider>
+    </AuthProvider>
+  );
+};
+
 export default App;
