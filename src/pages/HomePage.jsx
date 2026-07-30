@@ -126,7 +126,7 @@ const Hero = ({ navigate, isLoggedIn }) => {
           <div className="nb-stat__div" />
           <div className="nb-stat"><span className="nb-stat__n">{nums.p.toLocaleString()}+</span><span>Pitches Generated</span></div>
           <div className="nb-stat__div" />
-          <div className="nb-stat"><span className="nb-stat__n">4.9⭐</span><span>Avg Rating</span></div>
+          <div className="nb-stat"><span className="nb-stat__n">4.3⭐</span><span>Avg Rating</span></div>
         </div>
       </div>
       <div className="nb-hero__right"><InteractiveRobot3D /></div>

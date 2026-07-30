@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Wand2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import BrandLogo from './BrandLogo';
 import './Navbar.css';
@@ -10,7 +9,7 @@ const NavLink = ({ to, icon: Icon, label }) => {
   const isActive = location.pathname === to;
   return (
     <Link to={to} className={`nav-link ${isActive ? 'nav-link--active' : ''}`}>
-      <Icon size={18} />
+      {Icon && <Icon size={18} />}
       <span>{label}</span>
     </Link>
   );
@@ -30,8 +29,8 @@ const Navbar = () => {
         </Link>
 
         <div className="navbar-links">
-          <NavLink to="/"          icon={Wand2} label="Home" />
-          <NavLink to="/generator" icon={Wand2} label="AI Pitch Generator" />
+          <NavLink to="/" label="Home" />
+          <NavLink to="/generator" label="AI Pitch Generator" />
         </div>
         {!isGenerator && (
           <div className="navbar-actions">

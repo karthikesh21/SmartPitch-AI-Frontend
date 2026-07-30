@@ -135,7 +135,7 @@ const HistoryList = ({ history, onRestore, onDelete, onClearAll }) => {
       <div className="gp-history__header">
         <h3>Recent Generations</h3>
         <button className="gp-history__clear-btn" onClick={onClearAll} title="Clear all history">
-          🗑️ Clear All
+          Clear All
         </button>
       </div>
       <div className="gp-history__list">
@@ -229,7 +229,7 @@ const GeneratorPage = () => {
       <div className="gp-content">
         <div className="gp-hero">
           <SplitText
-            text="⚡ AI Pitch Generator"
+            text="AI Pitch Generator"
             tag="h1"
             delay={50}
             duration={1.25}
