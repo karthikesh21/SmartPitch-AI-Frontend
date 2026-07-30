@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import Hyperspeed from '../components/Effects/Hyperspeed';
 import BorderGlow from '../components/Effects/BorderGlow';
-import ClickSpark from '../components/Effects/ClickSpark';
+import SplitText from '../components/Effects/SplitText';
 import './GeneratorPage.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL;
@@ -9,32 +9,31 @@ const API = `${API_BASE_URL}/api/pitch/cold-mail`;
 
 const MailIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-    <rect x="2" y="4" width="20" height="16" rx="3"/><path d="m2 7 10 7 10-7"/>
+    <rect x="2" y="4" width="20" height="16" rx="3" /><path d="m2 7 10 7 10-7" />
   </svg>
 );
 const LinkedInIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-    <rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+    <rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" />
   </svg>
 );
 const PhoneIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.6 12.14a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.51 1.5h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l.86-.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.5 16z"/>
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.6 12.14a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.51 1.5h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l.86-.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.5 16z" />
   </svg>
 );
 const AdIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-    <path d="M3 11l19-9-9 19-2-8-8-2z"/>
+    <path d="M3 11l19-9-9 19-2-8-8-2z" />
   </svg>
 );
 
-
 const TYPES = [
-  { id: 'email',    label: 'Mail Pitch',        icon: <MailIcon />,     color: '#FF6B35', desc: 'Cold email with subject & CTA' },
-  { id: 'linkedin', label: 'LinkedIn Message',  icon: <LinkedInIcon />, color: '#0077B5', desc: 'Short, high-converting DM' },
-  { id: 'coldCall', label: 'Cold Call Script',  icon: <PhoneIcon />,    color: '#22C55E', desc: 'Full script with objection handler' },
-  { id: 'adCopy',   label: 'Advertising',       icon: <AdIcon />,       color: '#A855F7', desc: 'Ad copy that drives clicks' },
+  { id: 'email', label: 'Mail Pitch', icon: <MailIcon />, color: '#FF6B35', desc: 'Cold email with subject & CTA' },
+  { id: 'linkedin', label: 'LinkedIn Message', icon: <LinkedInIcon />, color: '#0077B5', desc: 'Short, high-converting DM' },
+  { id: 'coldCall', label: 'Cold Call Script', icon: <PhoneIcon />, color: '#22C55E', desc: 'Full script with objection handler' },
+  { id: 'adCopy', label: 'Advertising', icon: <AdIcon />, color: '#A855F7', desc: 'Ad copy that drives clicks' },
 ];
 
 const copyText = (text) => navigator.clipboard.writeText(text);
@@ -71,10 +70,10 @@ const Output = ({ type, data }) => {
   const panels = {
     email: (
       <>
-        <F label="Subject Line"            value={data.email.subject} />
-        <F label="Personalized Intro"      value={data.email.intro}   />
+        <F label="Subject Line" value={data.email.subject} />
+        <F label="Personalized Intro" value={data.email.intro} />
         <F label="Problem → Solution → Value" value={data.email.body} />
-        <F label="Call-to-Action"          value={data.email.cta}     />
+        <F label="Call-to-Action" value={data.email.cta} />
         <div className="gp-oactions">
           <button onClick={() => doCopy(flatEmail(data.email), 'e')} className="gp-btn gp-btn--copy">{copied === 'e' ? '✓ Copied' : 'Copy Email'}</button>
           <button onClick={() => window.open('https://mail.google.com/', '_blank')} className="gp-btn gp-btn--action">📧 Open Gmail</button>
@@ -83,9 +82,9 @@ const Output = ({ type, data }) => {
     ),
     linkedin: (
       <>
-        <F label="Hook"    value={data.linkedin.hook}    />
+        <F label="Hook" value={data.linkedin.hook} />
         <F label="Benefit" value={data.linkedin.benefit} />
-        <F label="Soft CTA" value={data.linkedin.cta}   />
+        <F label="Soft CTA" value={data.linkedin.cta} />
         <div className="gp-oactions">
           <button onClick={() => doCopy(flatLinkedIn(data.linkedin), 'l')} className="gp-btn gp-btn--copy">{copied === 'l' ? '✓ Copied' : 'Copy Message'}</button>
           <button onClick={() => window.open('https://www.linkedin.com/', '_blank')} className="gp-btn gp-btn--action">💼 Open LinkedIn</button>
@@ -94,11 +93,11 @@ const Output = ({ type, data }) => {
     ),
     coldCall: (
       <>
-        <F label="Opening Line"         value={data.coldCall.opening}   />
-        <F label="Problem Identification" value={data.coldCall.problemId}/>
-        <F label="Pitch"                value={data.coldCall.pitch}     />
-        <F label="Objection Handler"    value={data.coldCall.objection} />
-        <F label="Closing Ask"          value={data.coldCall.closing}   />
+        <F label="Opening Line" value={data.coldCall.opening} />
+        <F label="Problem Identification" value={data.coldCall.problemId} />
+        <F label="Pitch" value={data.coldCall.pitch} />
+        <F label="Objection Handler" value={data.coldCall.objection} />
+        <F label="Closing Ask" value={data.coldCall.closing} />
         <div className="gp-oactions">
           <button onClick={() => doCopy(flatCall(data.coldCall), 'c')} className="gp-btn gp-btn--copy">{copied === 'c' ? '✓ Copied' : 'Copy Script'}</button>
           <button onClick={() => saveTxt(flatCall(data.coldCall), 'cold-call-script.txt')} className="gp-btn gp-btn--action">💾 Save .txt</button>
@@ -107,9 +106,9 @@ const Output = ({ type, data }) => {
     ),
     adCopy: (
       <>
-        <F label="Headline"  value={data.adCopy.headline} />
-        <F label="Body Copy" value={data.adCopy.body}     />
-        <F label="CTA"       value={data.adCopy.cta}      />
+        <F label="Headline" value={data.adCopy.headline} />
+        <F label="Body Copy" value={data.adCopy.body} />
+        <F label="CTA" value={data.adCopy.cta} />
         <div className="gp-oactions">
           <button onClick={() => doCopy(flatAd(data.adCopy), 'a')} className="gp-btn gp-btn--copy">{copied === 'a' ? '✓ Copied' : 'Copy Ad Copy'}</button>
         </div>
@@ -129,17 +128,32 @@ const Output = ({ type, data }) => {
   );
 };
 
-const HistoryList = ({ history, onRestore }) => {
+const HistoryList = ({ history, onRestore, onDelete, onClearAll }) => {
   if (!history.length) return null;
   return (
     <div className="gp-history">
-      <h3>Recent Generations</h3>
+      <div className="gp-history__header">
+        <h3>Recent Generations</h3>
+        <button className="gp-history__clear-btn" onClick={onClearAll} title="Clear all history">
+          🗑️ Clear All
+        </button>
+      </div>
       <div className="gp-history__list">
         {history.map(item => (
           <div key={item.id} className="gp-history__item" onClick={() => onRestore(item)}>
             <span className="gp-history__type">{TYPES.find(t => t.id === item.type)?.label}</span>
             <span className="gp-history__name">{item.serviceName}</span>
             <span className="gp-history__time">{new Date(item.timestamp).toLocaleTimeString()}</span>
+            <button
+              className="gp-history__remove-btn"
+              title="Remove item"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(item.id);
+              }}
+            >
+              ✕
+            </button>
           </div>
         ))}
       </div>
@@ -197,14 +211,33 @@ const GeneratorPage = () => {
     setResult(item.data);
   };
 
+  const deleteHistoryItem = (id) => {
+    const next = history.filter(item => item.id !== id);
+    setHistory(next);
+    localStorage.setItem('pitchHistory', JSON.stringify(next));
+  };
+
+  const clearAllHistory = () => {
+    setHistory([]);
+    localStorage.removeItem('pitchHistory');
+  };
+
   return (
     <div className="gp-page">
       <div className="gp-bg"><Hyperspeed /></div>
 
       <div className="gp-content">
         <div className="gp-hero">
-          <h1>⚡ AI Pitch Generator</h1>
-          <p>Describe your product — get 4 pitch formats powered by Groq AI.</p>
+          <SplitText
+            text="⚡ AI Pitch Generator"
+            tag="h1"
+            delay={50}
+            duration={1.25}
+            ease="power3.out"
+            from={{ opacity: 0, y: 40 }}
+            to={{ opacity: 1, y: 0 }}
+            textAlign="center"
+          />
         </div>
 
         <div className="gp-form">
@@ -237,26 +270,24 @@ const GeneratorPage = () => {
               key={t.id}
               edgeSensitivity={30}
               glowColor="40 80 80"
-              backgroundColor="#060010"
-              borderRadius={28}
-              glowRadius={40}
-              glowIntensity={1}
-              coneSpread={25}
-              animated={false}
-              colors={['#c084fc', '#f472b6', '#38bdf8']}
+              glowRadius={160}
+              glowOpacity={0.8}
+              backgroundColor="#0a0c12"
+              borderColor="#1e2433"
             >
-              <ClickSpark sparkColor="#fff" sparkSize={10} sparkRadius={15} sparkCount={8} duration={400}>
-                <div
-                  className={`gp-card ${activeType === t.id ? 'gp-card--active' : ''} ${loading && activeType === t.id ? 'gp-card--loading' : ''}`}
-                  onClick={() => !loading && generate(t.id)}
-                  style={{ '--card-color': t.color }}
-                >
-                  <div className="gp-card__icon">{t.icon}</div>
-                  <strong>{t.label}</strong>
-                  <span>{t.desc}</span>
-                  {loading && activeType === t.id && <div className="gp-card__spinner" />}
-                </div>
-              </ClickSpark>
+              <div
+                className={`gp-card ${activeType === t.id && loading ? 'gp-card--loading' : ''}`}
+                onClick={() => !loading && generate(t.id)}
+              >
+                <div className="gp-card__icon" style={{ color: t.color }}>{t.icon}</div>
+                <h3 className="gp-card__title">{t.label}</h3>
+                <p className="gp-card__desc">{t.desc}</p>
+                {loading && activeType === t.id && (
+                  <div className="gp-card__loading-spinner">
+                    <span className="gp-spinner" />
+                  </div>
+                )}
+              </div>
             </BorderGlow>
           ))}
         </div>
@@ -267,7 +298,12 @@ const GeneratorPage = () => {
           <Output type={activeType} data={result} />
         </div>
 
-        <HistoryList history={history} onRestore={restore} />
+        <HistoryList
+          history={history}
+          onRestore={restore}
+          onDelete={deleteHistoryItem}
+          onClearAll={clearAllHistory}
+        />
       </div>
     </div>
   );
