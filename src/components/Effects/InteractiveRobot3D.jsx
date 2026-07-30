@@ -54,11 +54,7 @@ const InteractiveRobot3D = ({ height: customHeight = '420px', cameraDistance = 8
       reflectivity: 1.0,
     });
 
-    const glassHighlightMaterial = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.55,
-    });
+
 
     const blackMetalMaterial = new THREE.MeshStandardMaterial({
       color: 0x111520,
@@ -90,13 +86,6 @@ const InteractiveRobot3D = ({ height: customHeight = '420px', cameraDistance = 8
     const headMesh = new THREE.Mesh(headGeo, headMaterial);
     headMesh.scale.set(1.15, 0.96, 1.05);
     robotGroup.add(headMesh);
-
-    const highlightGeo = new THREE.SphereGeometry(0.35, 32, 16, 0, Math.PI * 1.5, 0, Math.PI * 0.5);
-    const highlightMesh = new THREE.Mesh(highlightGeo, glassHighlightMaterial);
-    highlightMesh.scale.set(1.8, 0.45, 0.2);
-    highlightMesh.position.set(0.55, 0.55, 1.35);
-    highlightMesh.rotation.set(-0.25, 0.25, 0.35);
-    robotGroup.add(highlightMesh);
 
     // --- FIXED BIG BLACK EYES ---
     const createFixedEyeGroup = (baseX) => {
