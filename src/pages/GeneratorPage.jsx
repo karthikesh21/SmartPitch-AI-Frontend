@@ -1,10 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import Hyperspeed from '../components/Effects/Hyperspeed';
 import BorderGlow from '../components/Effects/BorderGlow';
 import ClickSpark from '../components/Effects/ClickSpark';
-import BrandLogo from '../components/Layout/BrandLogo';
 import './GeneratorPage.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL;
@@ -151,8 +148,6 @@ const HistoryList = ({ history, onRestore }) => {
 };
 
 const GeneratorPage = () => {
-  const navigate = useNavigate();
-  const { isLoggedIn, logout } = useAuth();
   const [form, setForm] = useState({ serviceName: '', description: '' });
   const [activeType, setActiveType] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -205,22 +200,6 @@ const GeneratorPage = () => {
   return (
     <div className="gp-page">
       <div className="gp-bg"><Hyperspeed /></div>
-
-      <nav className="gp-nav">
-        <div className="gp-nav__inner">
-          <div className="gp-nav__logo" onClick={() => navigate('/')}>
-            <BrandLogo size={30} fontSize="1rem" fontWeight={800} gap="9px" />
-          </div>
-          <div className="gp-nav__acts">
-            <button className="gp-nav__back" onClick={() => navigate('/')}>← Home</button>
-            {isLoggedIn ? (
-              <button className="gp-nav__logout" onClick={() => { logout(); navigate('/'); }}>Logout</button>
-            ) : (
-              <button className="gp-nav__login" onClick={() => navigate('/login')}>Login</button>
-            )}
-          </div>
-        </div>
-      </nav>
 
       <div className="gp-content">
         <div className="gp-hero">
