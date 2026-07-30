@@ -261,19 +261,20 @@ const InteractiveRobot3D = ({ height: customHeight = '420px', cameraDistance = 8
       robotGroup.rotation.x += (targetHeadRotX - robotGroup.rotation.x) * 0.12;
       robotGroup.rotation.z += (targetHeadRotZ - robotGroup.rotation.z) * 0.12;
 
-      // Flexible springy antenna / tail physics reacting to head rotation & cursor motion
-      const targetAntennaZ = Math.sin(elapsedTime * 4.2) * 0.22 - robotGroup.rotation.z * 0.85 - currentEyeX * 0.35;
-      const targetAntennaX = Math.cos(elapsedTime * 3.6) * 0.18 - robotGroup.rotation.x * 0.65 - currentEyeY * 0.25;
+      // 3D Orbital Antenna Motion: Right -> Front -> Left -> Backwards
+      const antennaOrbitSpeed = elapsedTime * 2.8;
+      const orbitSwayZ = Math.sin(antennaOrbitSpeed) * 0.22 - robotGroup.rotation.z * 0.80 - currentEyeX * 0.40;
+      const orbitSwayX = Math.cos(antennaOrbitSpeed) * 0.22 - robotGroup.rotation.x * 0.65 - currentEyeY * 0.35;
 
-      antennaGroup.rotation.z += (targetAntennaZ - antennaGroup.rotation.z) * 0.14;
-      antennaGroup.rotation.x += (targetAntennaX - antennaGroup.rotation.x) * 0.14;
+      antennaGroup.rotation.z += (orbitSwayZ - antennaGroup.rotation.z) * 0.14;
+      antennaGroup.rotation.x += (orbitSwayX - antennaGroup.rotation.x) * 0.14;
 
-      // Multi-segment flexible stem & top ball wobble
-      antennaStem.rotation.z = Math.sin(elapsedTime * 5.2) * 0.16 - antennaGroup.rotation.z * 0.5;
-      antennaStem.rotation.x = Math.cos(elapsedTime * 4.6) * 0.14 - antennaGroup.rotation.x * 0.5;
+      // Secondary joint flex along orbital phase
+      antennaStem.rotation.z = Math.sin(antennaOrbitSpeed + 0.6) * 0.18 - antennaGroup.rotation.z * 0.45;
+      antennaStem.rotation.x = Math.cos(antennaOrbitSpeed + 0.6) * 0.18 - antennaGroup.rotation.x * 0.45;
 
-      antennaBall.position.x = Math.sin(elapsedTime * 5.8) * 0.09 + antennaGroup.rotation.z * 0.22;
-      antennaBall.position.z = Math.cos(elapsedTime * 5.8) * 0.09 + antennaGroup.rotation.x * 0.22;
+      antennaBall.position.x = Math.sin(antennaOrbitSpeed + 1.2) * 0.10 + antennaGroup.rotation.z * 0.20;
+      antennaBall.position.z = Math.cos(antennaOrbitSpeed + 1.2) * 0.10 + antennaGroup.rotation.x * 0.20;
 
       // Random + click blinking
       if (!isBlinking && now >= nextRandomBlinkTime) {
