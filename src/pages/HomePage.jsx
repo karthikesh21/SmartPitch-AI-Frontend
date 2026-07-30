@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import MagicBento from '../components/Effects/MagicBento';
 import FloatingLines from '../components/Effects/FloatingLines';
+import InteractiveRobot3D from '../components/Effects/InteractiveRobot3D';
 import BrandLogo from '../components/Layout/BrandLogo';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencil, faBullseye, faRocket, faRobot, faEnvelope, faPhone } from '@fortawesome/free-solid-svg-icons';
@@ -131,7 +132,7 @@ const Hero = ({ navigate, isLoggedIn }) => {
           <div className="nb-stat"><span className="nb-stat__n">4.9⭐</span><span>Avg Rating</span></div>
         </div>
       </div>
-      <div className="nb-hero__right"><Robot /></div>
+      <div className="nb-hero__right"><InteractiveRobot3D /></div>
     </section>
   );
 };
