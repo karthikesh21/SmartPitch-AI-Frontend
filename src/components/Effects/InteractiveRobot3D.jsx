@@ -307,13 +307,19 @@ const InteractiveRobot3D = () => {
     animate();
 
     // --- RESIZE ---
+    let resizeRafId;
     const handleResize = () => {
       if (!container) return;
-      const newW = container.clientWidth;
-      const newH = container.clientHeight;
-      camera.aspect = newW / newH;
-      camera.updateProjectionMatrix();
-      renderer.setSize(newW, newH);
+      cancelAnimationFrame(resizeRafId);
+      resizeRafId = requestAnimationFrame(() => {
+        const newW = container.clientWidth;
+        const newH = container.clientHeight;
+        if (newW && newH) {
+          camera.aspect = newW / newH;
+          camera.updateProjectionMatrix();
+          renderer.setSize(newW, newH);
+        }
+      });
     };
 
     window.addEventListener('resize', handleResize);
