@@ -90,7 +90,8 @@ const AppShell = () => {
 const App = () => {
   useEffect(() => {
     // Wake up backend when user visits (especially useful for free hosting tiers)
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    const rawUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    const apiUrl = rawUrl.replace(/\/+$/, '').replace(/\/api$/, '');
     fetch(`${apiUrl}/api/health`)
       .then(res => res.json())
       .then(data => console.log("Backend wake-up status:", data.status))

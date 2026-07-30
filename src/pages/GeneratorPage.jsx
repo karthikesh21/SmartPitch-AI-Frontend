@@ -4,7 +4,8 @@ import BorderGlow from '../components/Effects/BorderGlow';
 import SplitText from '../components/Effects/SplitText';
 import './GeneratorPage.css';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+const rawApiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_BASE_URL = rawApiUrl.replace(/\/+$/, '').replace(/\/api$/, '');
 const API = `${API_BASE_URL}/api/pitch/cold-mail`;
 
 const MailIcon = () => (
