@@ -261,9 +261,19 @@ const InteractiveRobot3D = ({ height: customHeight = '420px', cameraDistance = 8
       robotGroup.rotation.x += (targetHeadRotX - robotGroup.rotation.x) * 0.12;
       robotGroup.rotation.z += (targetHeadRotZ - robotGroup.rotation.z) * 0.12;
 
-      // Antenna springy sway reacting to head rotation
-      antennaGroup.rotation.z = Math.sin(elapsedTime * 3.5) * 0.08 - robotGroup.rotation.z * 0.45;
-      antennaGroup.rotation.x = Math.cos(elapsedTime * 2.8) * 0.05 - robotGroup.rotation.x * 0.3;
+      // Flexible springy antenna / tail physics reacting to head rotation & cursor motion
+      const targetAntennaZ = Math.sin(elapsedTime * 4.2) * 0.22 - robotGroup.rotation.z * 0.85 - currentEyeX * 0.35;
+      const targetAntennaX = Math.cos(elapsedTime * 3.6) * 0.18 - robotGroup.rotation.x * 0.65 - currentEyeY * 0.25;
+
+      antennaGroup.rotation.z += (targetAntennaZ - antennaGroup.rotation.z) * 0.14;
+      antennaGroup.rotation.x += (targetAntennaX - antennaGroup.rotation.x) * 0.14;
+
+      // Multi-segment flexible stem & top ball wobble
+      antennaStem.rotation.z = Math.sin(elapsedTime * 5.2) * 0.16 - antennaGroup.rotation.z * 0.5;
+      antennaStem.rotation.x = Math.cos(elapsedTime * 4.6) * 0.14 - antennaGroup.rotation.x * 0.5;
+
+      antennaBall.position.x = Math.sin(elapsedTime * 5.8) * 0.09 + antennaGroup.rotation.z * 0.22;
+      antennaBall.position.z = Math.cos(elapsedTime * 5.8) * 0.09 + antennaGroup.rotation.x * 0.22;
 
       // Random + click blinking
       if (!isBlinking && now >= nextRandomBlinkTime) {
