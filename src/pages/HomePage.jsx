@@ -26,31 +26,7 @@ const useScrollReveal = () => {
   }, []);
 };
 
-const Robot = () => (
-  <div className="nb-robot">
-    <div className="nb-robot__glow" />
-    <div className="nb-robot__antenna"><div className="nb-robot__ball" /></div>
-    <div className="nb-robot__head">
-      <div className="nb-robot__screen">
-        <div className="nb-robot__eyes"><div className="nb-robot__eye" /><div className="nb-robot__eye" /></div>
-        <div className="nb-robot__smile" />
-      </div>
-    </div>
-    <div className="nb-robot__body">
-      <div className="nb-robot__panel">
-        <div className="nb-robot__led" /><div className="nb-robot__led" /><div className="nb-robot__led" />
-      </div>
-    </div>
-    <div className="nb-robot__arm nb-robot__arm--l" />
-    <div className="nb-robot__arm nb-robot__arm--r" />
-    <div className="nb-robot__holo">
-      {[45, 70, 55, 85, 60].map((h, i) => <div key={i} className="nb-holo__bar" style={{ '--h': h + '%', '--d': i * 0.15 + 's' }} />)}
-    </div>
-    <div className="nb-robot__particles">
-      {[0, 1, 2, 3].map(i => <div key={i} className="nb-particle" style={{ '--i': i }} />)}
-    </div>
-  </div>
-);
+
 
 const Loader = ({ out }) => (
   <div className={`nb-loader${out ? ' nb-loader--out' : ''}`}>
