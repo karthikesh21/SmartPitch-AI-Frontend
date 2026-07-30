@@ -54,8 +54,8 @@ const Robot = () => (
 
 const Loader = ({ out }) => (
   <div className={`nb-loader${out ? ' nb-loader--out' : ''}`}>
-    <div style={{ width: '220px', height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <InteractiveRobot3D />
+    <div style={{ width: '140px', height: '140px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <InteractiveRobot3D height="140px" cameraDistance={9.5} />
     </div>
     <p>SmartPitch AI warming up…</p>
   </div>

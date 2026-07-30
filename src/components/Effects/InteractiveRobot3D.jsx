@@ -9,7 +9,7 @@ import * as THREE from 'three';
  * - Blinks randomly every 3-6s and on click via vertical eye scaling
  * - Floats and breathes with a natural sine wave
  */
-const InteractiveRobot3D = () => {
+const InteractiveRobot3D = ({ height: customHeight = '420px', cameraDistance = 8.2 }) => {
   const mountRef = useRef(null);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ const InteractiveRobot3D = () => {
     // --- SCENE, CAMERA, RENDERER SETUP ---
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
-    camera.position.set(0, 0, 7.5);
+    camera.position.set(0, 0, cameraDistance);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(width, height);
@@ -337,14 +337,14 @@ const InteractiveRobot3D = () => {
       }
       renderer.dispose();
     };
-  }, []);
+  }, [cameraDistance]);
 
   return (
     <div
       ref={mountRef}
       style={{
         width: '100%',
-        height: '420px',
+        height: customHeight,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
