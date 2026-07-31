@@ -1,5 +1,9 @@
 node_modules
 .env
-.env.local
-.env.production
 .env.*
+.pytest_cache
+build
+dist
+frontend/client/build
+*.log
+*firebase-adminsdk*.json

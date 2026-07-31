@@ -1,3 +1,3 @@
-const app = require('../../../backend/sales-pitch-generator/server/server.js');
+const app = require('../server/server.js');
 
 module.exports = app;
