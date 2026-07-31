@@ -1,6 +1,13 @@
-const nodemailer = require('nodemailer');
+let nodemailer = null;
+try {
+  nodemailer = require('nodemailer');
+} catch (e) {
+  console.warn("⚠️ Nodemailer optional import fallback:", e.message);
+}
 
 const createTransporter = () => {
+  if (!nodemailer) return null;
+
   if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
     return nodemailer.createTransport({
       host: process.env.SMTP_HOST,
@@ -13,7 +20,6 @@ const createTransporter = () => {
     });
   }
 
-  // Fallback to Gmail if SMTP_GMAIL_USER and SMTP_GMAIL_PASS are provided
   if (process.env.SMTP_GMAIL_USER && process.env.SMTP_GMAIL_PASS) {
     return nodemailer.createTransport({
       service: 'gmail',
@@ -54,13 +60,11 @@ const sendOTPEmail = async (toEmail, otp) => {
   `;
 
   if (!transporter) {
-    console.log('\n======================================================');
     console.log(`🔑 [DEV MODE OTP LOG] Password Reset OTP for ${toEmail}: ${otp}`);
-    console.log('======================================================\n');
     return {
       sent: true,
       devMode: true,
-      message: 'OTP generated successfully. (Dev mode: Check server logs or use the code on screen).'
+      message: 'OTP generated successfully. (Dev mode: OTP active).'
     };
   }
 
