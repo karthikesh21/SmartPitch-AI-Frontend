@@ -5,6 +5,23 @@ import { authAPI } from '../services/api';
 import BrandLogo from '../components/Layout/BrandLogo';
 import './AuthPage.css';
 
+const extractErrorMsg = (err) => {
+  if (!err) return 'An error occurred.';
+  if (typeof err === 'string') return err;
+  if (typeof err.error === 'string') return err.error;
+  if (typeof err.message === 'string') return err.message;
+  if (typeof err === 'object') {
+    if (err.error && typeof err.error === 'string') return err.error;
+    if (err.message && typeof err.message === 'string') return err.message;
+    try {
+      return JSON.stringify(err);
+    } catch (e) {
+      return 'An unexpected error occurred.';
+    }
+  }
+  return String(err);
+};
+
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,11 +59,10 @@ const ForgotPasswordPage = () => {
         }
         setStep(2);
       } else {
-        setError(res.error || 'Failed to send OTP.');
+        setError(extractErrorMsg(res?.error || 'Failed to send OTP.'));
       }
     } catch (err) {
-      const msg = typeof err === 'string' ? err : (err?.error || err?.message || 'Failed to send OTP.');
-      setError(msg);
+      setError(extractErrorMsg(err));
     } finally {
       setLoading(false);
     }
@@ -73,11 +89,10 @@ const ForgotPasswordPage = () => {
         setInfoMessage('OTP verified! Now enter your new password.');
         setStep(3);
       } else {
-        setError(res.error || 'Invalid OTP code.');
+        setError(extractErrorMsg(res?.error || 'Invalid OTP code.'));
       }
     } catch (err) {
-      const msg = typeof err === 'string' ? err : (err?.error || err?.message || 'Verification failed.');
-      setError(msg);
+      setError(extractErrorMsg(err));
     } finally {
       setLoading(false);
     }
@@ -105,7 +120,6 @@ const ForgotPasswordPage = () => {
     try {
       const res = await authAPI.resetPassword({ email, otp, newPassword });
       if (res && res.success) {
-        // Automatically attempt login with new password
         const loginRes = await login(email, newPassword);
         if (loginRes.success) {
           setStep(4);
@@ -113,11 +127,10 @@ const ForgotPasswordPage = () => {
           setStep(4);
         }
       } else {
-        setError(res.error || 'Failed to reset password.');
+        setError(extractErrorMsg(res?.error || 'Failed to reset password.'));
       }
     } catch (err) {
-      const msg = typeof err === 'string' ? err : (err?.error || err?.message || 'Failed to reset password.');
-      setError(msg);
+      setError(extractErrorMsg(err));
     } finally {
       setLoading(false);
     }
@@ -153,7 +166,7 @@ const ForgotPasswordPage = () => {
                 />
               </div>
 
-              {error && <div className="auth-error">{error}</div>}
+              {error && <div className="auth-error">{String(error)}</div>}
 
               <button type="submit" className="auth-btn" disabled={loading}>
                 {loading ? <span className="auth-spinner" /> : 'Send OTP to Mail →'}
@@ -214,7 +227,7 @@ const ForgotPasswordPage = () => {
                 />
               </div>
 
-              {error && <div className="auth-error">{error}</div>}
+              {error && <div className="auth-error">{String(error)}</div>}
 
               <button type="submit" className="auth-btn" disabled={loading}>
                 {loading ? <span className="auth-spinner" /> : 'Verify OTP →'}
@@ -260,7 +273,7 @@ const ForgotPasswordPage = () => {
                 />
               </div>
 
-              {error && <div className="auth-error">{error}</div>}
+              {error && <div className="auth-error">{String(error)}</div>}
 
               <button type="submit" className="auth-btn" disabled={loading}>
                 {loading ? <span className="auth-spinner" /> : 'Reset Password & Login →'}

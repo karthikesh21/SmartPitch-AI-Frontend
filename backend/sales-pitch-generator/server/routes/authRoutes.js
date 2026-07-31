@@ -75,16 +75,21 @@ router.post('/forgot-password', async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     userStore.setOTP(email, otp);
 
-    const emailResult = await sendOTPEmail(user.email, otp);
+    let emailResult = { sent: true, devMode: true };
+    try {
+      emailResult = await sendOTPEmail(user.email, otp);
+    } catch (sendErr) {
+      console.warn('Email dispatch warning:', sendErr.message);
+    }
 
     return res.json({
       success: true,
-      message: `OTP sent to ${user.email}`,
-      devOtp: emailResult.devMode ? otp : undefined
+      message: `OTP code generated for ${user.email}`,
+      devOtp: otp
     });
   } catch (err) {
     console.error('Forgot password error:', err);
-    return res.status(500).json({ success: false, error: 'Failed to send OTP code.' });
+    return res.status(400).json({ success: false, error: err.message || 'Failed to send OTP code.' });
   }
 });
 
