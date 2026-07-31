@@ -1,8 +1,10 @@
 import axios from "axios";
 
-
-const rawApiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-const API_BASE_URL = rawApiUrl.replace(/\/+$/, '').replace(/\/api$/, '');
+let rawApiUrl = process.env.REACT_APP_API_URL || '';
+if (typeof rawApiUrl === 'string' && rawApiUrl.includes('onrender.com')) {
+  rawApiUrl = ''; // Override stale Render URL to use live Vercel serverless API
+}
+const API_BASE_URL = rawApiUrl ? rawApiUrl.replace(/\/+$/, '').replace(/\/api$/, '') : '';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -10,7 +12,6 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-
 
 api.interceptors.request.use(
   (config) => {
@@ -26,7 +27,6 @@ api.interceptors.response.use(
     return Promise.reject(error.response?.data || error.message);
   }
 );
-
 
 export const authAPI = {
   signup: (payload) => api.post("/api/auth/signup", payload),
