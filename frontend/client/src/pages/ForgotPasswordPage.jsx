@@ -279,7 +279,7 @@ const ForgotPasswordPage = () => {
               border: '2px solid #22c55e',
               display: 'flex',
               alignItems: 'center',
-              justify-content: 'center',
+              justifyContent: 'center',
               margin: '0 auto 20px',
               fontSize: '28px',
               color: '#22c55e'
