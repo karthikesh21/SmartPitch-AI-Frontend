@@ -27,4 +27,14 @@ app.get("/", (req, res) => {
   res.send("🚀 SmartPitch AI Server Running");
 });
 
+// Global error handler to catch exceptions and print clean JSON error
+app.use((err, req, res, next) => {
+  console.error("Vercel Serverless Function Error:", err);
+  res.status(200).json({
+    success: false,
+    error: err.message || "Internal Server Error",
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
+});
+
 module.exports = app;
