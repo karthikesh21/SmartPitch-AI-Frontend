@@ -142,6 +142,10 @@ router.post('/reset-password', async (req, res) => {
     });
   } catch (err) {
     console.error('Reset password error:', err);
+    return res.status(500).json({ success: false, error: 'Failed to reset password.' });
+  }
+});
+
 // @route   GET /api/auth/users
 // @desc    Get list of registered users
 router.get('/users', (req, res) => {
