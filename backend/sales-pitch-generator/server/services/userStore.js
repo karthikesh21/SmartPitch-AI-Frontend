@@ -1,8 +1,30 @@
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const bcrypt = require('bcryptjs');
 
-const USERS_FILE = path.join(__dirname, '../data/users.json');
+let USERS_FILE = path.join(__dirname, '../data/users.json');
+let inMemoryUsers = [];
+
+// Helper to get writable users file
+const getWritablePath = () => {
+  try {
+    const dir = path.dirname(USERS_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    // Test write permission
+    const testFile = path.join(dir, '.test_write');
+    fs.writeFileSync(testFile, 'test');
+    fs.unlinkSync(testFile);
+    return USERS_FILE;
+  } catch (e) {
+    // Fallback to OS temp dir on read-only environments (e.g. Vercel serverless)
+    return path.join(os.tmpdir(), 'smartpitch_users.json');
+  }
+};
+
+const targetUsersFile = getWritablePath();
 
 // In-memory OTP cache: { [normalizedEmail]: { otp: '123456', expiresAt: timestamp } }
 const otpStore = new Map();
@@ -10,30 +32,32 @@ const otpStore = new Map();
 // Helper to safely read users
 const readUsers = () => {
   try {
-    if (!fs.existsSync(USERS_FILE)) {
-      const dir = path.dirname(USERS_FILE);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-      fs.writeFileSync(USERS_FILE, JSON.stringify([], null, 2));
-      return [];
+    if (fs.existsSync(targetUsersFile)) {
+      const data = fs.readFileSync(targetUsersFile, 'utf8');
+      inMemoryUsers = JSON.parse(data || '[]');
+      return inMemoryUsers;
     }
-    const data = fs.readFileSync(USERS_FILE, 'utf8');
-    return JSON.parse(data || '[]');
+    if (fs.existsSync(USERS_FILE)) {
+      const data = fs.readFileSync(USERS_FILE, 'utf8');
+      inMemoryUsers = JSON.parse(data || '[]');
+      return inMemoryUsers;
+    }
+    return inMemoryUsers;
   } catch (err) {
     console.error('Error reading users file:', err);
-    return [];
+    return inMemoryUsers;
   }
 };
 
 // Helper to safely write users
 const writeUsers = (users) => {
+  inMemoryUsers = users;
   try {
-    const dir = path.dirname(USERS_FILE);
+    const dir = path.dirname(targetUsersFile);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
+    fs.writeFileSync(targetUsersFile, JSON.stringify(users, null, 2), 'utf8');
   } catch (err) {
     console.error('Error writing users file:', err);
   }
