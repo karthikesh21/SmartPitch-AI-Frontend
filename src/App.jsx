@@ -14,6 +14,7 @@ import LinkedInPage from './pages/LinkedInPage';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 
 import { PitchProvider } from './context/PitchContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -45,7 +46,7 @@ const PrivacyPage = () => (
 
 
 
-const FULL_PAGE = ['/', '/login', '/signup'];
+const FULL_PAGE = ['/', '/login', '/signup', '/forgot-password'];
 
 
 
@@ -74,6 +75,7 @@ const AppShell = () => {
           <Route path="/landing" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
 
           <Route path="/terms" element={<TermsPage />} />

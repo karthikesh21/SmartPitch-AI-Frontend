@@ -22,7 +22,7 @@ const SignUpPage = () => {
     setForm(prev => ({ ...prev, [key]: value }));
   };
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
 
     // Validation
@@ -44,17 +44,19 @@ const SignUpPage = () => {
     setLoading(true);
     setError('');
 
-    setTimeout(() => {
-      const result = signup(form.email, form.password, form.name);
+    const result = await signup(form.email, form.password, form.name);
 
-      if (result.success) {
-        login(form.email, form.password);
+    if (result.success) {
+      const loginRes = await login(form.email, form.password);
+      if (loginRes.success) {
         navigate('/generator');
       } else {
-        setError(result.error);
-        setLoading(false);
+        navigate('/login');
       }
-    }, 1000);
+    } else {
+      setError(result.error);
+      setLoading(false);
+    }
   };
 
   return (

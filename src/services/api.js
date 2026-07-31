@@ -28,6 +28,14 @@ api.interceptors.response.use(
 );
 
 
+export const authAPI = {
+  signup: (payload) => api.post("/api/auth/signup", payload),
+  login: (payload) => api.post("/api/auth/login", payload),
+  forgotPassword: (payload) => api.post("/api/auth/forgot-password", payload),
+  verifyOTP: (payload) => api.post("/api/auth/verify-otp", payload),
+  resetPassword: (payload) => api.post("/api/auth/reset-password", payload),
+};
+
 export const pitchAPI = {
   generate: (payload) => api.post("/api/pitch/generate", payload),
   getHistory: () => api.get("/api/pitch/history"),
