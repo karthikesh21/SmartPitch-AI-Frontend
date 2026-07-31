@@ -95,7 +95,7 @@ const Hero = ({ navigate, isLoggedIn }) => {
           Describe your product once and let SmartPitch AI generate high converting cold emails, LinkedIn outreach, ad copy, and call scripts in seconds.
         </p>
         <button className="nb-cta-btn" onClick={() => navigate(isLoggedIn ? '/generator' : '/login')}>
-          {isLoggedIn ? '  Click to Generate Pitches' : 'Create Your First Pitch ⚡'}
+          {isLoggedIn ? '  Click to Generate Pitches' : 'Create Your First Pitch'}
         </button>
         <div className="nb-stats">
           <div className="nb-stat"><span className="nb-stat__n">{nums.u.toLocaleString()}+</span><span>Happy Customers</span></div>

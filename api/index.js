@@ -12,11 +12,9 @@ app.use(cors({
 
 app.use(express.json());
 
-// Support both /api/auth and /auth rewrites in Vercel
 app.use("/api/auth", authRoutes);
 app.use("/auth", authRoutes);
 
-// Support both /api/pitch and /pitch rewrites in Vercel
 app.use("/api/pitch", pitchRoutes);
 app.use("/pitch", pitchRoutes);
 
@@ -32,7 +30,6 @@ app.get("/", (req, res) => {
   res.send("🚀 SmartPitch AI Server Running");
 });
 
-// Global error handler to catch exceptions and print clean JSON error
 app.use((err, req, res, next) => {
   console.error("Vercel Serverless Function Error:", err);
   res.status(200).json({
@@ -41,4 +38,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-module.exports = app;
+module.exports = (req, res) => {
+  return app(req, res);
+};
