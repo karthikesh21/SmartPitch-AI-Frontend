@@ -13,19 +13,23 @@ const LoginPage = () => {
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    if (!form.email || !form.password) { setError('Please fill in all fields.'); return; }
-    setLoading(true); setError('');
-    setTimeout(() => {
-      const result = login(form.email, form.password);
-      if (result.success) {
-        navigate('/generator');
-      } else {
-        setError(result.error);
-        setLoading(false);
-      }
-    }, 1000);
+    if (!form.email || !form.password) {
+      setError('Please fill in all fields.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    const result = await login(form.email, form.password);
+    if (result.success) {
+      navigate('/generator');
+    } else {
+      setError(result.error);
+      setLoading(false);
+    }
   };
 
   return (
@@ -45,11 +49,23 @@ const LoginPage = () => {
         <form onSubmit={submit} className="auth-form">
           <div className="auth-field">
             <label>Email</label>
-            <input type="email" placeholder="you@company.com" value={form.email} onChange={e => set('email', e.target.value)} autoComplete="email" />
+            <input
+              type="email"
+              placeholder="you@company.com"
+              value={form.email}
+              onChange={e => set('email', e.target.value)}
+              autoComplete="email"
+            />
           </div>
           <div className="auth-field">
             <label>Password</label>
-            <input type="password" placeholder="••••••••" value={form.password} onChange={e => set('password', e.target.value)} autoComplete="current-password" />
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={form.password}
+              onChange={e => set('password', e.target.value)}
+              autoComplete="current-password"
+            />
           </div>
 
           {error && <div className="auth-error">{error}</div>}
@@ -59,7 +75,11 @@ const LoginPage = () => {
           </button>
         </form>
 
-        <button type="button" className="auth-forgot" onClick={() => console.log('Forgot password functionality')}>
+        <button
+          type="button"
+          className="auth-forgot"
+          onClick={() => navigate('/forgot-password', { state: { email: form.email } })}
+        >
           Forgot password?
         </button>
         <div className="auth-divider"><span>or</span></div>

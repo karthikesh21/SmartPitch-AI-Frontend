@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
@@ -14,6 +14,7 @@ import LinkedInPage from './pages/LinkedInPage';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 
 import { PitchProvider } from './context/PitchContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -45,7 +46,7 @@ const PrivacyPage = () => (
 
 
 
-const FULL_PAGE = ['/', '/login', '/signup'];
+const FULL_PAGE = ['/', '/login', '/signup', '/forgot-password'];
 
 
 
@@ -74,12 +75,13 @@ const AppShell = () => {
           <Route path="/landing" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-          
+
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
 
-       
+
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
@@ -87,14 +89,26 @@ const AppShell = () => {
   );
 };
 
-const App = () => (
-  <AuthProvider>
-    <PitchProvider>
-      <Router>
-        <AppShell />
-      </Router>
-    </PitchProvider>
-  </AuthProvider>
-);
+const App = () => {
+  useEffect(() => {
+    // Wake up backend when user visits (especially useful for free hosting tiers)
+    const rawUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    const apiUrl = rawUrl.replace(/\/+$/, '').replace(/\/api$/, '');
+    fetch(`${apiUrl}/api/health`)
+      .then(res => res.json())
+      .then(data => console.log("Backend wake-up status:", data.status))
+      .catch(err => console.log("Waking up backend..."));
+  }, []);
+
+  return (
+    <AuthProvider>
+      <PitchProvider>
+        <Router>
+          <AppShell />
+        </Router>
+      </PitchProvider>
+    </AuthProvider>
+  );
+};
 
 export default App;

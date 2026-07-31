@@ -1,0 +1,23 @@
+.app {
+  min-height: 100vh;
+  background-color: var(--dark-bg);
+}
+
+/* Main Content */
+.main-content {
+  padding-top: 80px;
+}
+
+.main-content--no-pad {
+  padding-top: 0;
+}
+
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  color: var(--dark-text-muted);
+  font-size: 1.5rem;
+}

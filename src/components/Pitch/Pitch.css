@@ -1,0 +1,12 @@
+/* Pitch component styles */
+.pitch-generator,
+.pitch-display,
+.email-pitch,
+.linkedin-pitch,
+.cold-call-pitch,
+.ad-copy-pitch {
+  padding: var(--space-4);
+  background: var(--dark-card);
+  border: 1px solid var(--dark-border);
+  border-radius: var(--radius-lg);
+}

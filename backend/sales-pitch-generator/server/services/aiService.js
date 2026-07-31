@@ -64,15 +64,38 @@ Return EXACTLY this JSON (no extra text):
         ],
         temperature: 0.75,
         max_tokens: 1200,
+        response_format: { type: "json_object" }
       });
-      const raw = response.choices[0].message.content.trim()
-        .replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-      const match = raw.match(/\{[\s\S]*\}/);
-      if (!match) throw new Error("No JSON in AI response");
-      return JSON.parse(match[0]);
+      
+      return this.parseAIJsonResponse(response.choices[0].message.content);
     } catch (err) {
       console.error("Cold mail AI error:", err);
       throw err;
+    }
+  }
+
+  parseAIJsonResponse(rawContent) {
+    const raw = (rawContent || "").trim()
+      .replace(/```json\n?/gi, "")
+      .replace(/```\n?/g, "")
+      .trim();
+
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error("No JSON object found in AI response");
+
+    const jsonStr = match[0];
+    try {
+      return JSON.parse(jsonStr);
+    } catch (firstErr) {
+      try {
+        const sanitized = jsonStr.replace(/"([^"\\]*(\\.[^"\\]*)*)"/g, (m, p1) => {
+          return '"' + p1.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t') + '"';
+        });
+        return JSON.parse(sanitized);
+      } catch (secondErr) {
+        const fallbackClean = jsonStr.replace(/[\u0000-\u001F]+/g, " ");
+        return JSON.parse(fallbackClean);
+      }
     }
   }
 
@@ -84,7 +107,7 @@ PRODUCT:
 Name: ${product?.name || "N/A"}
 Description: ${product?.description || "N/A"}
 Features:
-${(product?.features || []).map(f => `- ${f.feature}: ${f.benefit}`).join('\n')}
+${(product?.features || []).map(f => `- {f.feature}: ${f.benefit}`).join('\n')}
 Problems Solved: ${(product?.problemsSolved || []).join(", ")}
 USP: ${(product?.uniqueSellingPoints || []).join(", ")}
 
