@@ -12,10 +12,15 @@ app.use(cors({
 
 app.use(express.json());
 
+// Support both /api/auth and /auth rewrites in Vercel
 app.use("/api/auth", authRoutes);
-app.use("/api/pitch", pitchRoutes);
+app.use("/auth", authRoutes);
 
-app.get("/api/health", (req, res) => {
+// Support both /api/pitch and /pitch rewrites in Vercel
+app.use("/api/pitch", pitchRoutes);
+app.use("/pitch", pitchRoutes);
+
+app.get(["/api/health", "/health"], (req, res) => {
   res.json({
     status: "OK",
     message: "Backend is running!",
@@ -32,8 +37,7 @@ app.use((err, req, res, next) => {
   console.error("Vercel Serverless Function Error:", err);
   res.status(200).json({
     success: false,
-    error: err.message || "Internal Server Error",
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    error: err.message || "Internal Server Error"
   });
 });
 
