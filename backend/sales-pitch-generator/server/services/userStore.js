@@ -3,67 +3,42 @@ const path = require('path');
 const os = require('os');
 const bcrypt = require('bcryptjs');
 
-const USERS_FILE = path.join(__dirname, '../data/users.json');
 let inMemoryUsers = [];
 
-// Helper to get writable users file safely on serverless read-only filesystems
-const getWritablePath = () => {
-  if (process.env.VERCEL || process.env.NOW_BUILDER) {
-    return path.join(os.tmpdir(), 'smartpitch_users.json');
-  }
-  try {
-    const dir = path.dirname(USERS_FILE);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    return USERS_FILE;
-  } catch (e) {
-    return path.join(os.tmpdir(), 'smartpitch_users.json');
-  }
-};
-
-let targetUsersFile = null;
-const getTargetUsersFile = () => {
-  if (!targetUsersFile) {
-    targetUsersFile = getWritablePath();
-  }
-  return targetUsersFile;
-};
-
-// In-memory OTP cache: { [normalizedEmail]: { otp: '123456', expiresAt: timestamp } }
-const otpStore = new Map();
-
-// Helper to safely read users
+// Helper to safely read users in serverless Vercel environment
 const readUsers = () => {
-  const filePath = getTargetUsersFile();
-  try {
-    if (fs.existsSync(filePath)) {
-      const data = fs.readFileSync(filePath, 'utf8');
-      inMemoryUsers = JSON.parse(data || '[]');
-      return inMemoryUsers;
-    }
-    if (fs.existsSync(USERS_FILE)) {
-      const data = fs.readFileSync(USERS_FILE, 'utf8');
-      inMemoryUsers = JSON.parse(data || '[]');
-      return inMemoryUsers;
-    }
-    return inMemoryUsers;
-  } catch (err) {
-    console.error('Error reading users file:', err);
+  if (inMemoryUsers.length > 0) {
     return inMemoryUsers;
   }
+
+  // 1. Try requiring bundled users.json so Vercel bundler includes initial users
+  try {
+    const bundled = require('../data/users.json');
+    if (Array.isArray(bundled) && bundled.length > 0) {
+      inMemoryUsers = [...bundled];
+      return inMemoryUsers;
+    }
+  } catch (e) {}
+
+  // 2. Try reading from writable OS temp directory
+  try {
+    const tempPath = path.join(os.tmpdir(), 'smartpitch_users.json');
+    if (fs.existsSync(tempPath)) {
+      const data = fs.readFileSync(tempPath, 'utf8');
+      inMemoryUsers = JSON.parse(data || '[]');
+      return inMemoryUsers;
+    }
+  } catch (e) {}
+
+  return inMemoryUsers;
 };
 
-// Helper to safely write users
+// Helper to safely write users to memory and temp storage
 const writeUsers = (users) => {
   inMemoryUsers = users;
-  const filePath = getTargetUsersFile();
   try {
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(filePath, JSON.stringify(users, null, 2), 'utf8');
+    const tempPath = path.join(os.tmpdir(), 'smartpitch_users.json');
+    fs.writeFileSync(tempPath, JSON.stringify(users, null, 2), 'utf8');
   } catch (err) {
     console.error('Error writing users file:', err);
   }
@@ -131,9 +106,10 @@ const verifyUserPassword = async (email, password) => {
   };
 };
 
+const otpStore = new Map();
+
 const setOTP = (email, otp) => {
   const normEmail = normalizeEmail(email);
-  // OTP valid for 10 minutes (600,000 ms)
   const expiresAt = Date.now() + 10 * 60 * 1000;
   otpStore.set(normEmail, { otp: String(otp), expiresAt });
 };
