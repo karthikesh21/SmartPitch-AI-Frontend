@@ -29,7 +29,7 @@ app.get(["/api/health", "/health"], (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("🚀 SmartPitch AI Server Running");
+  res.send("SmartPitch AI Server Running");
 });
 
 // Global error handler to catch exceptions and print clean JSON error
