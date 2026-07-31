@@ -10,19 +10,8 @@ const authRoutes = require("./routes/authRoutes");
 const app = express();
 
 
-const allowedOrigins = [
-  process.env.CORS_ORIGIN,
-  'http://localhost:3000',
-];
-
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin) || (typeof origin === 'string' && origin.endsWith('.vercel.app'))) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true,
   credentials: true
 }));
 
