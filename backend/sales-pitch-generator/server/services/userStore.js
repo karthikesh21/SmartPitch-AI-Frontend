@@ -3,37 +3,42 @@ const path = require('path');
 const os = require('os');
 const bcrypt = require('bcryptjs');
 
-let USERS_FILE = path.join(__dirname, '../data/users.json');
+const USERS_FILE = path.join(__dirname, '../data/users.json');
 let inMemoryUsers = [];
 
-// Helper to get writable users file
+// Helper to get writable users file safely on serverless read-only filesystems
 const getWritablePath = () => {
+  if (process.env.VERCEL || process.env.NOW_BUILDER) {
+    return path.join(os.tmpdir(), 'smartpitch_users.json');
+  }
   try {
     const dir = path.dirname(USERS_FILE);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    // Test write permission
-    const testFile = path.join(dir, '.test_write');
-    fs.writeFileSync(testFile, 'test');
-    fs.unlinkSync(testFile);
     return USERS_FILE;
   } catch (e) {
-    // Fallback to OS temp dir on read-only environments (e.g. Vercel serverless)
     return path.join(os.tmpdir(), 'smartpitch_users.json');
   }
 };
 
-const targetUsersFile = getWritablePath();
+let targetUsersFile = null;
+const getTargetUsersFile = () => {
+  if (!targetUsersFile) {
+    targetUsersFile = getWritablePath();
+  }
+  return targetUsersFile;
+};
 
 // In-memory OTP cache: { [normalizedEmail]: { otp: '123456', expiresAt: timestamp } }
 const otpStore = new Map();
 
 // Helper to safely read users
 const readUsers = () => {
+  const filePath = getTargetUsersFile();
   try {
-    if (fs.existsSync(targetUsersFile)) {
-      const data = fs.readFileSync(targetUsersFile, 'utf8');
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, 'utf8');
       inMemoryUsers = JSON.parse(data || '[]');
       return inMemoryUsers;
     }
@@ -52,12 +57,13 @@ const readUsers = () => {
 // Helper to safely write users
 const writeUsers = (users) => {
   inMemoryUsers = users;
+  const filePath = getTargetUsersFile();
   try {
-    const dir = path.dirname(targetUsersFile);
+    const dir = path.dirname(filePath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    fs.writeFileSync(targetUsersFile, JSON.stringify(users, null, 2), 'utf8');
+    fs.writeFileSync(filePath, JSON.stringify(users, null, 2), 'utf8');
   } catch (err) {
     console.error('Error writing users file:', err);
   }
