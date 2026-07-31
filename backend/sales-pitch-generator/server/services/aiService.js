@@ -2,12 +2,24 @@ const Groq = require("groq-sdk");
 
 class AIService {
   constructor() {
-    this.groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    this.groq = null;
+  }
+
+  getGroq() {
+    if (!this.groq) {
+      const apiKey = process.env.GROQ_API_KEY;
+      if (!apiKey) {
+        console.warn("⚠️ GROQ_API_KEY environment variable is missing.");
+      }
+      this.groq = new Groq({ apiKey: apiKey || 'dummy-key-for-init' });
+    }
+    return this.groq;
   }
 
   async generatePitch(product, audience, framework = "AIDA") {
     const prompt = this.buildPrompt(product, audience, framework);
-    const response = await this.groq.chat.completions.create({
+    const groq = this.getGroq();
+    const response = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages: [
         { role: "system", content: this.getSystemPrompt(framework) },
@@ -56,7 +68,8 @@ Return EXACTLY this JSON (no extra text):
 }`;
 
     try {
-      const response = await this.groq.chat.completions.create({
+      const groq = this.getGroq();
+      const response = await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
         messages: [
           { role: "system", content: system },
@@ -107,7 +120,7 @@ PRODUCT:
 Name: ${product?.name || "N/A"}
 Description: ${product?.description || "N/A"}
 Features:
-${(product?.features || []).map(f => `- {f.feature}: ${f.benefit}`).join('\n')}
+${(product?.features || []).map(f => `- ${f.feature}: ${f.benefit}`).join('\n')}
 Problems Solved: ${(product?.problemsSolved || []).join(", ")}
 USP: ${(product?.uniqueSellingPoints || []).join(", ")}
 

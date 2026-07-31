@@ -30,25 +30,35 @@ app.use(express.json());
 
 // ✅ INITIALIZE FIREBASE ADMIN (for Storage)
 if (!admin.apps.length) {
-  const serviceAccount = {
-    type: process.env.FIREBASE_TYPE,
-    project_id: process.env.FIREBASE_PROJECT_ID,
-    private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-    private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    client_email: process.env.FIREBASE_CLIENT_EMAIL,
-    client_id: process.env.FIREBASE_CLIENT_ID,
-    auth_uri: process.env.FIREBASE_AUTH_URI,
-    token_uri: process.env.FIREBASE_TOKEN_URI,
-  };
+  try {
+    if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
+      const serviceAccount = {
+        type: process.env.FIREBASE_TYPE,
+        project_id: process.env.FIREBASE_PROJECT_ID,
+        private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+        private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        client_email: process.env.FIREBASE_CLIENT_EMAIL,
+        client_id: process.env.FIREBASE_CLIENT_ID,
+        auth_uri: process.env.FIREBASE_AUTH_URI,
+        token_uri: process.env.FIREBASE_TOKEN_URI,
+      };
 
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET
-  });
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        storageBucket: process.env.FIREBASE_STORAGE_BUCKET
+      });
+    }
+  } catch (err) {
+    console.warn("⚠️ Firebase Admin init warning:", err.message);
+  }
 }
 
-// Make bucket available to routes
-app.locals.bucket = admin.storage().bucket(process.env.FIREBASE_STORAGE_BUCKET);
+// Make bucket available to routes if initialized
+if (admin.apps.length && process.env.FIREBASE_STORAGE_BUCKET) {
+  try {
+    app.locals.bucket = admin.storage().bucket(process.env.FIREBASE_STORAGE_BUCKET);
+  } catch (e) {}
+}
 
 // Your routes
 app.use("/api/auth", authRoutes);
