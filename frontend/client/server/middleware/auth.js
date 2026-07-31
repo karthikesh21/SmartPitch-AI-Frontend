@@ -1,4 +1,4 @@
-const { auth } = require('../config/firebase');
+const firebaseConfig = require('../config/firebase');
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -8,8 +8,11 @@ const authMiddleware = async (req, res, next) => {
       return res.status(401).json({ error: 'No token provided' });
     }
 
-    // Verify Firebase token
-    const decodedToken = await auth.verifyIdToken(token);
+    if (!firebaseConfig.auth) {
+      return res.status(401).json({ error: 'Firebase authentication not configured' });
+    }
+
+    const decodedToken = await firebaseConfig.auth.verifyIdToken(token);
     
     req.user = {
       id: decodedToken.uid,
@@ -26,8 +29,8 @@ const authMiddleware = async (req, res, next) => {
 const optionalAuth = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
-    if (token) {
-      const decodedToken = await auth.verifyIdToken(token);
+    if (token && firebaseConfig.auth) {
+      const decodedToken = await firebaseConfig.auth.verifyIdToken(token);
       req.user = {
         id: decodedToken.uid,
         email: decodedToken.email
