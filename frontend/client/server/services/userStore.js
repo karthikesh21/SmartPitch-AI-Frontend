@@ -79,6 +79,16 @@ const findUserByEmail = (email) => {
   return users.find(u => normalizeEmail(u.email) === normEmail);
 };
 
+const getAllUsers = () => {
+  const users = readUsers();
+  return users.map(u => ({
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    createdAt: u.createdAt
+  }));
+};
+
 const createUser = async ({ name, email, password }) => {
   const normEmail = normalizeEmail(email);
   const users = readUsers();
@@ -177,6 +187,7 @@ const resetPasswordWithOTP = async (email, otp, newPassword) => {
 
 module.exports = {
   findUserByEmail,
+  getAllUsers,
   createUser,
   verifyUserPassword,
   setOTP,
