@@ -57,7 +57,7 @@ const HistoryPage = () => {
           <div className="hp-empty">
             <p>No saved pitch history found.</p>
             <button onClick={() => navigate('/generator')} className="hp-btn">
-              ⚡ Generate New Pitch
+              Generate New Pitch
             </button>
           </div>
         ) : (

@@ -57,7 +57,7 @@ app.post(["/api/auth/forgot-password", "/auth/forgot-password"], async (req, res
       return res.status(404).json({ success: false, error: 'User not found. Please sign up first.' });
     }
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    userStore.setOTP(user.email, otp);
+    await userStore.setOTP(user.email, otp);
 
     let emailResult = { sent: true, devMode: true };
     try {
@@ -68,22 +68,20 @@ app.post(["/api/auth/forgot-password", "/auth/forgot-password"], async (req, res
 
     return res.json({
       success: true,
-      message: `OTP code sent to ${user.email}`,
-      devOtp: otp,
-      devMode: emailResult.devMode
+      message: `OTP code sent to ${user.email}`
     });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
 });
 
-app.post(["/api/auth/verify-otp", "/auth/verify-otp"], (req, res) => {
+app.post(["/api/auth/verify-otp", "/auth/verify-otp"], async (req, res) => {
   try {
     const { email, otp } = req.body || {};
     if (!email || !otp) {
       return res.status(400).json({ success: false, error: 'Email and OTP code are required.' });
     }
-    const result = userStore.verifyOTPCode(email, otp);
+    const result = await userStore.verifyOTPCode(email, otp);
     if (!result.valid) {
       return res.status(400).json({ success: false, error: result.error });
     }

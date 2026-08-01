@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
 
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    userStore.setOTP(user.email, otp);
+    await userStore.setOTP(user.email, otp);
 
     // Send email via nodemailer / email service
     let emailResult = { sent: true, devMode: true };
@@ -34,9 +34,7 @@ module.exports = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: `OTP code sent to ${user.email}`,
-      devOtp: otp,
-      devMode: emailResult.devMode
+      message: `OTP code sent to ${user.email}`
     });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message || 'Server error' });

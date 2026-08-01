@@ -36,7 +36,6 @@ const ForgotPasswordPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [infoMessage, setInfoMessage] = useState('');
-  const [devOtpHint, setDevOtpHint] = useState('');
 
   // Step 1: Send OTP
   const handleSendOTP = async (e) => {
@@ -48,15 +47,11 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     setError('');
     setInfoMessage('');
-    setDevOtpHint('');
 
     try {
       const res = await authAPI.forgotPassword({ email });
       if (res && res.success) {
         setInfoMessage(res.message || 'OTP code sent to your email address.');
-        if (res.devOtp) {
-          setDevOtpHint(`Dev helper: OTP is ${res.devOtp}`);
-        }
         setStep(2);
       } else {
         setError(extractErrorMsg(res?.error || 'Failed to send OTP.'));
@@ -191,20 +186,6 @@ const ForgotPasswordPage = () => {
                 marginBottom: '16px'
               }}>
                 {infoMessage}
-              </div>
-            )}
-
-            {devOtpHint && (
-              <div style={{
-                background: 'rgba(234,179,8,0.12)',
-                border: '1px solid rgba(234,179,8,0.3)',
-                borderRadius: '10px',
-                color: '#fde047',
-                fontSize: '0.82rem',
-                padding: '10px 14px',
-                marginBottom: '16px'
-              }}>
-                {devOtpHint}
               </div>
             )}
 

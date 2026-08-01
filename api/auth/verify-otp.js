@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
       return res.status(400).json({ success: false, error: 'Email and OTP code are required.' });
     }
 
-    const result = userStore.verifyOTPCode(email, otp);
+    const result = await userStore.verifyOTPCode(email, otp);
     if (!result.valid) {
       return res.status(400).json({ success: false, error: result.error });
     }

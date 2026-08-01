@@ -10,7 +10,7 @@ let bcrypt = null;
 try {
   bcrypt = require('bcryptjs');
 } catch (e) {
-  console.warn("⚠️ Bcryptjs optional import fallback:", e.message);
+  console.warn("Bcryptjs optional import fallback:", e.message);
 }
 
 const hashPassword = async (password) => {
@@ -18,7 +18,7 @@ const hashPassword = async (password) => {
     try {
       const salt = await bcrypt.genSalt(10);
       return await bcrypt.hash(password, salt);
-    } catch (e) {}
+    } catch (e) { }
   }
   const salt = crypto.randomBytes(16).toString('hex');
   const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
@@ -46,7 +46,7 @@ const comparePassword = async (password, storedHash) => {
       const [salt, originalHash] = strHash.split(':');
       const hash = crypto.pbkdf2Sync(strPass, salt, 1000, 64, 'sha512').toString('hex');
       if (hash === originalHash) return true;
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // 3. Plaintext match fallback for dev / initial seed users
@@ -61,7 +61,7 @@ const fetchCloudUsers = async () => {
     if (Array.isArray(res.data) && res.data.length > 0) {
       return res.data;
     }
-  } catch (e) {}
+  } catch (e) { }
   return [];
 };
 
@@ -71,7 +71,7 @@ const syncCloudUsers = async (users) => {
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       timeout: 4000
     });
-  } catch (e) {}
+  } catch (e) { }
 };
 
 const readUsersSync = () => {
@@ -81,7 +81,7 @@ const readUsersSync = () => {
     if (Array.isArray(bundled)) {
       seedUsers = bundled;
     }
-  } catch (e) {}
+  } catch (e) { }
 
   let tempUsers = [];
   try {
@@ -90,7 +90,7 @@ const readUsersSync = () => {
       const data = fs.readFileSync(tempPath, 'utf8');
       tempUsers = JSON.parse(data || '[]');
     }
-  } catch (e) {}
+  } catch (e) { }
 
   const userMap = new Map();
   seedUsers.forEach(u => { if (u && u.email) userMap.set(u.email.trim().toLowerCase(), u); });
@@ -118,7 +118,7 @@ const writeUsers = async (users) => {
   try {
     const tempPath = path.join(os.tmpdir(), 'smartpitch_users.json');
     fs.writeFileSync(tempPath, JSON.stringify(users, null, 2), 'utf8');
-  } catch (err) {}
+  } catch (err) { }
 
   await syncCloudUsers(users);
 };
@@ -187,32 +187,43 @@ const verifyUserPassword = async (email, password) => {
   };
 };
 
-const otpStore = new Map();
-
-const setOTP = (email, otp) => {
+const setOTP = async (email, otp) => {
   const normEmail = normalizeEmail(email);
-  const expiresAt = Date.now() + 10 * 60 * 1000;
-  otpStore.set(normEmail, { otp: String(otp), expiresAt });
+  const users = await readUsersAsync();
+  const index = users.findIndex(u => normalizeEmail(u.email) === normEmail);
+  if (index >= 0) {
+    users[index].otp = String(otp).trim();
+    users[index].otpExpiresAt = Date.now() + 10 * 60 * 1000;
+    await writeUsers(users);
+  }
 };
 
-const getOTPData = (email) => {
+const getOTPData = async (email) => {
   const normEmail = normalizeEmail(email);
-  return otpStore.get(normEmail);
+  const users = await readUsersAsync();
+  const user = users.find(u => normalizeEmail(u.email) === normEmail);
+  if (user && user.otp) {
+    return { otp: user.otp, expiresAt: user.otpExpiresAt };
+  }
+  return null;
 };
 
-const verifyOTPCode = (email, otp) => {
+const verifyOTPCode = async (email, otp) => {
   const normEmail = normalizeEmail(email);
-  const data = otpStore.get(normEmail);
-  if (!data) {
+  const users = await readUsersAsync();
+  const user = users.find(u => normalizeEmail(u.email) === normEmail);
+
+  if (!user || !user.otp) {
     return { valid: false, error: 'No OTP requested for this email or OTP expired.' };
   }
 
-  if (Date.now() > data.expiresAt) {
-    otpStore.delete(normEmail);
+  if (Date.now() > (user.otpExpiresAt || 0)) {
+    user.otp = null;
+    await writeUsers(users);
     return { valid: false, error: 'OTP has expired. Please request a new one.' };
   }
 
-  if (String(data.otp).trim() !== String(otp).trim()) {
+  if (String(user.otp).trim() !== String(otp).trim()) {
     return { valid: false, error: 'Invalid OTP code.' };
   }
 
@@ -221,7 +232,7 @@ const verifyOTPCode = (email, otp) => {
 
 const resetPasswordWithOTP = async (email, otp, newPassword) => {
   const normEmail = normalizeEmail(email);
-  const otpResult = verifyOTPCode(normEmail, otp);
+  const otpResult = await verifyOTPCode(normEmail, otp);
   if (!otpResult.valid) {
     return { success: false, error: otpResult.error };
   }
@@ -233,10 +244,10 @@ const resetPasswordWithOTP = async (email, otp, newPassword) => {
   }
 
   users[index].password = await hashPassword(newPassword);
+  users[index].otp = null;
   users[index].updatedAt = new Date().toISOString();
 
   await writeUsers(users);
-  otpStore.delete(normEmail);
 
   return { success: true, message: 'Password updated successfully.' };
 };
