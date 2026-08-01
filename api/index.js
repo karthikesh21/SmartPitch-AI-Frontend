@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const userStore = require("../server/services/userStore");
 const aiService = require("../server/services/aiService");
+const { sendOTPEmail } = require("../server/services/emailService");
 
 const app = express();
 
@@ -56,8 +57,21 @@ app.post(["/api/auth/forgot-password", "/auth/forgot-password"], async (req, res
       return res.status(404).json({ success: false, error: 'User not found. Please sign up first.' });
     }
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    userStore.setOTP(email, otp);
-    return res.json({ success: true, message: `OTP code generated for ${user.email}`, devOtp: otp });
+    userStore.setOTP(user.email, otp);
+
+    let emailResult = { sent: true, devMode: true };
+    try {
+      emailResult = await sendOTPEmail(user.email, otp);
+    } catch (mailErr) {
+      console.warn('Email dispatch warning:', mailErr.message);
+    }
+
+    return res.json({
+      success: true,
+      message: `OTP code sent to ${user.email}`,
+      devOtp: otp,
+      devMode: emailResult.devMode
+    });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
