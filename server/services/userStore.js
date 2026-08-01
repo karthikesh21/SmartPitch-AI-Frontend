@@ -27,18 +27,30 @@ const hashPassword = async (password) => {
 
 const comparePassword = async (password, storedHash) => {
   if (!storedHash) return false;
-  if (bcrypt && storedHash.startsWith('$2a$')) {
+  const strHash = String(storedHash).trim();
+  const strPass = String(password).trim();
+
+  // 1. Check bcrypt hashes ($2a$, $2b$, $2y$, $2$)
+  if (bcrypt && (strHash.startsWith('$2a$') || strHash.startsWith('$2b$') || strHash.startsWith('$2y$') || strHash.startsWith('$2$'))) {
     try {
-      return await bcrypt.compare(password, storedHash);
+      const match = await bcrypt.compare(strPass, strHash);
+      if (match) return true;
+    } catch (e) {
+      console.warn("Bcrypt compare error:", e.message);
+    }
+  }
+
+  // 2. Check salt:hash format (pbkdf2Sync)
+  if (strHash.includes(':')) {
+    try {
+      const [salt, originalHash] = strHash.split(':');
+      const hash = crypto.pbkdf2Sync(strPass, salt, 1000, 64, 'sha512').toString('hex');
+      if (hash === originalHash) return true;
     } catch (e) {}
   }
-  if (storedHash.includes(':')) {
-    const [salt, originalHash] = storedHash.split(':');
-    const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
-    return hash === originalHash;
-  }
-  // Plaintext match fallback for dev / initial seed users
-  return String(password).trim() === String(storedHash).trim();
+
+  // 3. Plaintext match fallback for dev / initial seed users
+  return strPass === strHash;
 };
 
 let inMemoryUsers = [];
