@@ -68,7 +68,11 @@ app.post(["/api/auth/forgot-password", "/auth/forgot-password"], async (req, res
 
     return res.json({
       success: true,
-      message: `OTP code sent to ${user.email}`
+      message: emailResult.devMode
+        ? `OTP code generated for ${user.email}`
+        : `OTP code sent to ${user.email}`,
+      devOtp: emailResult.devMode ? otp : null,
+      devMode: emailResult.devMode
     });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });

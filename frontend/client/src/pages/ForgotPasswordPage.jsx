@@ -36,6 +36,7 @@ const ForgotPasswordPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [infoMessage, setInfoMessage] = useState('');
+  const [devOtpHint, setDevOtpHint] = useState('');
 
   // Step 1: Send OTP
   const handleSendOTP = async (e) => {
@@ -47,11 +48,15 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     setError('');
     setInfoMessage('');
+    setDevOtpHint('');
 
     try {
       const res = await authAPI.forgotPassword({ email });
       if (res && res.success) {
-        setInfoMessage(`📬 OTP verification code sent to ${email}. Please check your email inbox or spam folder.`);
+        setInfoMessage(res.message || `📬 OTP verification code generated for ${email}.`);
+        if (res.devOtp) {
+          setDevOtpHint(res.devOtp);
+        }
         setStep(2);
       } else {
         setError(extractErrorMsg(res?.error || 'Failed to send OTP.'));
@@ -186,6 +191,21 @@ const ForgotPasswordPage = () => {
                 marginBottom: '16px'
               }}>
                 {infoMessage}
+              </div>
+            )}
+
+            {devOtpHint && (
+              <div style={{
+                background: 'rgba(234,179,8,0.12)',
+                border: '1px solid rgba(234,179,8,0.3)',
+                borderRadius: '10px',
+                color: '#fde047',
+                fontSize: '0.82rem',
+                padding: '10px 14px',
+                marginBottom: '16px',
+                lineHeight: 1.4
+              }}>
+                ℹ️ <strong>SMTP Not Configured in Vercel:</strong> Live emails require <code>SMTP_GMAIL_USER</code> & <code>SMTP_GMAIL_PASS</code> in Vercel Env Vars. For testing right now, your OTP code is: <strong style={{ letterSpacing: '2px', fontSize: '1rem' }}>{devOtpHint}</strong>
               </div>
             )}
 
