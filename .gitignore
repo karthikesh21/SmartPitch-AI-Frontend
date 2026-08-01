@@ -1,9 +1,29 @@
+# Dependencies
 node_modules
+/.pnp
+.pnp.js
+
+# Production builds
+/build
+/dist
+
+# Environment variables
 .env
-.env.*
-.pytest_cache
-build
-dist
-frontend/client/build
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# Testing & Logs
+/coverage
 *.log
-*firebase-adminsdk*.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# System & IDE
+.DS_Store
+.vscode/
+.idea/
+.pytest_cache/

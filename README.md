@@ -1,120 +1,106 @@
-# SmartPitch AI
+# 🚀 SmartPitch AI
 
-SmartPitch AI is a full stack sales pitch generator that combines a React frontend with an Express backend powered by Firebase and the Groq AI SDK. The app helps users generate email, LinkedIn, cold call, and ad copy pitches from product and audience inputs.
+[![Vercel Deployment](https://img.shields.io/badge/Deployment-Vercel-success?style=for-the-badge&logo=vercel)](https://smart-pitch-ai-frontend-wlr7.vercel.app)
+[![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green?style=for-the-badge&logo=nodedotjs)](https://nodejs.org/)
+[![Groq AI](https://img.shields.io/badge/AI_Engine-Groq_LLaMA_3.3-orange?style=for-the-badge)](https://groq.com/)
 
-## Project Structure
+**SmartPitch AI** is an AI-powered B2B sales pitch generator that creates high-converting cold emails, LinkedIn messages, cold call scripts, and ad copy in seconds.
 
-- `frontend/client/` — React application
-  - Components, pages, services, and styles for the UI
-  - Uses `axios` to call the API via `REACT_APP_API_URL`
-- `backend/sales-pitch-generator/server/` — Express API server
-  - Routes for pitch generation and cold email/copy generation
-  - Firebase admin integration and optional auth
-  - Uses `groq-sdk` for AI completions
+---
 
-## Features
+## 🌟 Key Features
 
-- Generate sales pitches using product + audience data
-- Supports multiple output formats: email, LinkedIn, cold call, ad copy
-- Optional Firebase-authenticated pitch history storage
-- Separate frontend and backend for clear local development
+- **⚡ Multi-Format Pitch Generation**: Generate Cold Mail, LinkedIn DMs, Phone Scripts, and Advertising Copy tailored to any role.
+- **🔐 Global Cloud Authentication**: Real-time cross-device user authentication (Laptop, PC, Mobile Phone).
+- **🔑 6-Digit OTP Password Reset**: Automated 6-digit OTP verification system with live email dispatch.
+- **📜 Pitch History Storage**: Review, copy, and manage your previously generated pitches.
+- **🎨 3D Interactive Robot**: Dynamic Three.js interactive 3D robot header with smooth cursor tracking.
+- **📱 Fully Responsive**: Tailored mobile UI optimized for all smartphone screens.
 
-## Getting Started
+---
 
-### 1. Install frontend dependencies
+## 📁 Repository Structure
+
+```
+SmartPitch-AI/
+├── api/                   # Vercel Serverless Function API handlers
+│   ├── auth/              # Auth routes: signup, login, forgot-password, verify-otp, reset-password
+│   ├── pitch/             # Pitch routes: generate, cold-mail
+│   ├── index.js           # Serverless Express app handler
+│   └── health.js          # Health check endpoint
+├── server/                # Core Backend Services & Data Store
+│   ├── data/              # Initial seed users store (users.json)
+│   └── services/          # userStore.js (Cloud DB), aiService.js (Groq), emailService.js
+├── src/                   # React 18 Frontend
+│   ├── components/        # Interactive Robot 3D, Navbar, BrandLogo, Layout
+│   ├── context/           # AuthContext (local & cloud fallback state)
+│   ├── pages/             # HomePage, GeneratorPage, LoginPage, SignUpPage, ForgotPasswordPage, HistoryPage
+│   └── services/          # Axios API client
+├── public/                # Static public assets & HTML template
+├── package.json           # Dependencies & build scripts
+└── vercel.json            # Vercel deployment configuration
+```
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend**: React 18, React Router v6, Axios, Three.js, FontAwesome
+- **Backend**: Node.js, Express, Vercel Serverless Functions
+- **AI Engine**: Groq SDK (`llama-3.3-70b-versatile`)
+- **Database & Persistence**: Global Cloud JSON Store + Local Storage Fallback
+- **Mail Service**: Nodemailer (SMTP / Gmail App Password)
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone & Install Dependencies
 
 ```bash
-cd "frontend/client"
+git clone https://github.com/karthikesh21/SmartPitch-AI-Frontend.git
+cd SmartPitch-AI-Frontend
 npm install
 ```
 
-### 2. Install backend dependencies
+### 2. Environment Setup
 
-```bash
-cd "backend/sales-pitch-generator/server"
-npm install
-```
-
-## Environment Variables
-
-### Frontend
-
-Create a `.env` file inside `frontend/client/` with:
+Create a `.env` file in the root directory:
 
 ```env
-REACT_APP_API_URL=http://localhost:5000/api
+# AI Engine Key
+GROQ_API_KEY=your_groq_api_key
+
+# Live Email SMTP Credentials (Optional for real email delivery)
+SMTP_GMAIL_USER=your_email@gmail.com
+SMTP_GMAIL_PASS=your_gmail_app_password
 ```
 
-This should point to the backend API root, because the frontend calls endpoints like `/pitch/generate` on top of this base URL.
-
-### Backend
-
-Create a `.env` file inside `backend/sales-pitch-generator/server/` with the following values:
-
-```env
-FIREBASE_PROJECT_ID=your-firebase-project-id
-FIREBASE_CLIENT_EMAIL=your-firebase-client-email
-FIREBASE_PRIVATE_KEY="your-firebase-private-key"
-GROQ_API_KEY=your-groq-api-key
-PORT=5000
-NODE_ENV=development
-```
-
-> Do not commit secrets to source control.
-
-## Running Locally
-
-### Backend
+### 3. Run Locally
 
 ```bash
-cd "backend/sales-pitch-generator/server"
-npm run dev
-```
-
-This starts the Express server on the configured `PORT` (default `5000`).
-
-### Frontend
-
-```bash
-cd "frontend/client"
 npm start
 ```
 
-The React app starts in development mode and uses `REACT_APP_API_URL` to connect to the backend.
+The app will launch at `http://localhost:3000`.
 
-## API Endpoints
+---
 
-The backend exposes these routes under `/api/pitch`:
+## 📡 API Routes
 
-- `POST /api/pitch/generate`
-  - Request body: `{ product, audience, framework }`
-  - Generates a full sales pitch using the selected framework
-- `POST /api/pitch/cold-mail`
-  - Request body: `{ productName, productDescription, targetRole, problem, valueProposition }`
-  - Returns structured cold outreach copy in JSON
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/auth/signup` | Register a new user account |
+| `POST` | `/api/auth/login` | Authenticate user & start session |
+| `POST` | `/api/auth/forgot-password` | Generate & dispatch 6-digit OTP code |
+| `POST` | `/api/auth/verify-otp` | Verify 6-digit OTP code |
+| `POST` | `/api/auth/reset-password` | Update password using verified OTP |
+| `POST` | `/api/pitch/generate` | Generate full sales pitch |
+| `POST` | `/api/pitch/cold-mail` | Generate 4 sales outreach formats |
 
-## Frontend Routes
+---
 
-- `/` — Home page
-- `/generator` — Protected pitch generator page
-- `/linkedin` — LinkedIn sales flow page
-- `/login` — Login page
-- `/signup` — Signup page
-- `/terms` — Terms & Conditions
-- `/privacy` — Privacy Policy
+## 📄 License
 
-## Notes
-
-- The backend uses Firebase Admin SDK for optional token verification.
-- The AI service currently uses the `groq-sdk` and a `llama-3.3-70b-versatile` model.
-- The frontend uses `react-router-dom` for routing and `axios` for API calls.
-
-## Troubleshooting
-
-- If the frontend cannot reach the backend, verify `REACT_APP_API_URL` in `frontend/client/.env`.
-- If the backend fails to initialize Firebase, verify the three Firebase env vars and ensure `FIREBASE_PRIVATE_KEY` preserves line breaks.
-- For CORS issues, confirm the backend server is running and accepting requests from the frontend origin.
-
-## License
-
-This repository does not include a license file.
+Distributed under the MIT License. See `LICENSE` for more information.
