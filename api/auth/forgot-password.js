@@ -1,18 +1,4 @@
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-
-const normalizeEmail = (email) => (email ? String(email).trim().toLowerCase() : '');
-
-const readUsers = () => {
-  try {
-    const tempPath = path.join(os.tmpdir(), 'smartpitch_users.json');
-    if (fs.existsSync(tempPath)) {
-      return JSON.parse(fs.readFileSync(tempPath, 'utf8') || '[]');
-    }
-  } catch (e) {}
-  return [];
-};
+const userStore = require('../../server/services/userStore');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -27,15 +13,14 @@ module.exports = async (req, res) => {
     if (!email) {
       return res.status(400).json({ success: false, error: 'Please enter your email address.' });
     }
-    const normEmail = normalizeEmail(email);
-    const users = readUsers();
-    const user = users.find(u => normalizeEmail(u.email) === normEmail);
 
+    const user = userStore.findUserByEmail(email);
     if (!user) {
       return res.status(404).json({ success: false, error: 'User not found. Please sign up first.' });
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    userStore.setOTP(email, otp);
 
     return res.status(200).json({
       success: true,

@@ -6,7 +6,7 @@ import './AuthPage.css';
 
 const SignUpPage = () => {
   const navigate = useNavigate();
-  const { login, signup } = useAuth();
+  const { login, signup, setSession } = useAuth();
 
   const [form, setForm] = useState({
     name: '',
@@ -48,13 +48,12 @@ const SignUpPage = () => {
 
     if (result.success) {
       const loginRes = await login(form.email, form.password);
-      if (loginRes.success) {
-        navigate('/generator');
-      } else {
-        navigate('/login');
+      if (!loginRes.success && result.user) {
+        setSession(result.user);
       }
+      navigate('/generator');
     } else {
-      setError(result.error);
+      setError(result.error || 'Signup failed');
       setLoading(false);
     }
   };

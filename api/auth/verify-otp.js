@@ -9,20 +9,19 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    const { email, password } = req.body || {};
-    if (!email || !password) {
-      return res.status(400).json({ success: false, error: 'Please enter email and password.' });
+    const { email, otp } = req.body || {};
+    if (!email || !otp) {
+      return res.status(400).json({ success: false, error: 'Email and OTP code are required.' });
     }
 
-    const result = await userStore.verifyUserPassword(email, password);
-    if (!result.success) {
-      return res.status(400).json(result);
+    const result = userStore.verifyOTPCode(email, otp);
+    if (!result.valid) {
+      return res.status(400).json({ success: false, error: result.error });
     }
 
     return res.status(200).json({
       success: true,
-      message: 'Logged in successfully.',
-      user: result.user
+      message: 'OTP verified successfully.'
     });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message || 'Server error' });

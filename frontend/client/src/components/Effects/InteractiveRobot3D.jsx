@@ -223,12 +223,12 @@ const InteractiveRobot3D = ({ height: customHeight = '420px', cameraDistance = 8
     container.addEventListener('click', handleClick);
 
     // --- ANIMATION LOOP ---
-    let clock = new THREE.Clock();
+    const startTime = performance.now();
     let animationFrameId;
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
-      const elapsedTime = clock.getElapsedTime();
+      const elapsedTime = (performance.now() - startTime) / 1000;
       const now = Date.now();
 
       // Floating & breathing

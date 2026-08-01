@@ -9,20 +9,22 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    const { email, password } = req.body || {};
-    if (!email || !password) {
-      return res.status(400).json({ success: false, error: 'Please enter email and password.' });
+    const { email, otp, newPassword } = req.body || {};
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({ success: false, error: 'Please fill in all fields.' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, error: 'New password must be at least 6 characters.' });
     }
 
-    const result = await userStore.verifyUserPassword(email, password);
+    const result = await userStore.resetPasswordWithOTP(email, otp, newPassword);
     if (!result.success) {
       return res.status(400).json(result);
     }
 
     return res.status(200).json({
       success: true,
-      message: 'Logged in successfully.',
-      user: result.user
+      message: 'Password reset successfully.'
     });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message || 'Server error' });
