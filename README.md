@@ -1,11 +1,15 @@
 # 🚀 SmartPitch AI
 
 [![Vercel Deployment](https://img.shields.io/badge/Deployment-Vercel-success?style=for-the-badge&logo=vercel)](https://smart-pitch-ai-frontend-wlr7.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Open_App-FF6B35?style=for-the-badge&logo=googlechrome)](https://smart-pitch-ai-frontend-wlr7.vercel.app)
 [![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react)](https://reactjs.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green?style=for-the-badge&logo=nodedotjs)](https://nodejs.org/)
 [![Groq AI](https://img.shields.io/badge/AI_Engine-Groq_LLaMA_3.3-orange?style=for-the-badge)](https://groq.com/)
 
 **SmartPitch AI** is an AI-powered B2B sales pitch generator that creates high-converting cold emails, LinkedIn messages, cold call scripts, and ad copy in seconds.
+
+### 🌐 **Live Web Application & Demo**
+👉 **[Click Here to Open SmartPitch AI Live Demo](https://smart-pitch-ai-frontend-wlr7.vercel.app)**
 
 ---
 
