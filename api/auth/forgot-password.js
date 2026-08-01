@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
       return res.status(400).json({ success: false, error: 'Please enter your email address.' });
     }
 
-    const user = userStore.findUserByEmail(email);
+    const user = await userStore.findUserByEmail(email);
     if (!user) {
       return res.status(404).json({ success: false, error: 'User not found. Please sign up first.' });
     }

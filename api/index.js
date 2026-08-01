@@ -51,7 +51,7 @@ app.post(["/api/auth/forgot-password", "/auth/forgot-password"], async (req, res
     if (!email) {
       return res.status(400).json({ success: false, error: 'Please enter your email address.' });
     }
-    const user = userStore.findUserByEmail(email);
+    const user = await userStore.findUserByEmail(email);
     if (!user) {
       return res.status(404).json({ success: false, error: 'User not found. Please sign up first.' });
     }
@@ -98,9 +98,9 @@ app.post(["/api/auth/reset-password", "/auth/reset-password"], async (req, res) 
   }
 });
 
-app.get(["/api/auth/users", "/auth/users"], (req, res) => {
+app.get(["/api/auth/users", "/auth/users"], async (req, res) => {
   try {
-    const users = userStore.getAllUsers();
+    const users = await userStore.getAllUsers();
     return res.json({ success: true, count: users.length, users });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });

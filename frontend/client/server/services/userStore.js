@@ -2,6 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const crypto = require('crypto');
+const axios = require('axios');
+
+const CLOUD_DB_URL = 'https://jsonblob.com/api/jsonBlob/019fbe8a-68c7-7f9e-a74e-fa48a3618fba';
 
 let bcrypt = null;
 try {
@@ -40,8 +43,26 @@ const comparePassword = async (password, storedHash) => {
 
 let inMemoryUsers = [];
 
-const readUsers = () => {
-  // Always combine bundled seed users + temp storage + memory users
+const fetchCloudUsers = async () => {
+  try {
+    const res = await axios.get(CLOUD_DB_URL, { timeout: 3500 });
+    if (Array.isArray(res.data) && res.data.length > 0) {
+      return res.data;
+    }
+  } catch (e) {}
+  return [];
+};
+
+const syncCloudUsers = async (users) => {
+  try {
+    await axios.put(CLOUD_DB_URL, users, {
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      timeout: 4000
+    });
+  } catch (e) {}
+};
+
+const readUsersSync = () => {
   let seedUsers = [];
   try {
     const bundled = require('../data/users.json');
@@ -60,45 +81,48 @@ const readUsers = () => {
   } catch (e) {}
 
   const userMap = new Map();
-  // Add seed users
-  seedUsers.forEach(u => {
-    if (u && u.email) userMap.set(u.email.trim().toLowerCase(), u);
-  });
-  // Add temp users (overriding seed users if updated)
-  tempUsers.forEach(u => {
-    if (u && u.email) userMap.set(u.email.trim().toLowerCase(), u);
-  });
-  // Add memory users
-  inMemoryUsers.forEach(u => {
-    if (u && u.email) userMap.set(u.email.trim().toLowerCase(), u);
-  });
+  seedUsers.forEach(u => { if (u && u.email) userMap.set(u.email.trim().toLowerCase(), u); });
+  tempUsers.forEach(u => { if (u && u.email) userMap.set(u.email.trim().toLowerCase(), u); });
+  inMemoryUsers.forEach(u => { if (u && u.email) userMap.set(u.email.trim().toLowerCase(), u); });
 
   inMemoryUsers = Array.from(userMap.values());
   return inMemoryUsers;
 };
 
-const writeUsers = (users) => {
+const readUsersAsync = async () => {
+  const localUsers = readUsersSync();
+  const cloudUsers = await fetchCloudUsers();
+
+  const userMap = new Map();
+  localUsers.forEach(u => { if (u && u.email) userMap.set(u.email.trim().toLowerCase(), u); });
+  cloudUsers.forEach(u => { if (u && u.email) userMap.set(u.email.trim().toLowerCase(), u); });
+
+  inMemoryUsers = Array.from(userMap.values());
+  return inMemoryUsers;
+};
+
+const writeUsers = async (users) => {
   inMemoryUsers = users;
   try {
     const tempPath = path.join(os.tmpdir(), 'smartpitch_users.json');
     fs.writeFileSync(tempPath, JSON.stringify(users, null, 2), 'utf8');
-  } catch (err) {
-    console.error('Error writing users file:', err);
-  }
+  } catch (err) {}
+
+  await syncCloudUsers(users);
 };
 
 const normalizeEmail = (email) => {
   return email ? String(email).trim().toLowerCase() : '';
 };
 
-const findUserByEmail = (email) => {
+const findUserByEmail = async (email) => {
   const normEmail = normalizeEmail(email);
-  const users = readUsers();
+  const users = await readUsersAsync();
   return users.find(u => normalizeEmail(u.email) === normEmail);
 };
 
-const getAllUsers = () => {
-  const users = readUsers();
+const getAllUsers = async () => {
+  const users = await readUsersAsync();
   return users.map(u => ({
     id: u.id,
     name: u.name,
@@ -109,7 +133,7 @@ const getAllUsers = () => {
 
 const createUser = async ({ name, email, password }) => {
   const normEmail = normalizeEmail(email);
-  const users = readUsers();
+  const users = await readUsersAsync();
 
   if (users.some(u => normalizeEmail(u.email) === normEmail)) {
     throw new Error('User already exists with this email');
@@ -126,13 +150,16 @@ const createUser = async ({ name, email, password }) => {
   };
 
   users.push(newUser);
-  writeUsers(users);
+  await writeUsers(users);
 
   return { id: newUser.id, name: newUser.name, email: newUser.email };
 };
 
 const verifyUserPassword = async (email, password) => {
-  const user = findUserByEmail(email);
+  const normEmail = normalizeEmail(email);
+  const users = await readUsersAsync();
+  const user = users.find(u => normalizeEmail(u.email) === normEmail);
+
   if (!user) {
     return { success: false, error: 'User not found. Please sign up first.' };
   }
@@ -187,7 +214,7 @@ const resetPasswordWithOTP = async (email, otp, newPassword) => {
     return { success: false, error: otpResult.error };
   }
 
-  const users = readUsers();
+  const users = await readUsersAsync();
   const index = users.findIndex(u => normalizeEmail(u.email) === normEmail);
   if (index === -1) {
     return { success: false, error: 'User not found.' };
@@ -196,7 +223,7 @@ const resetPasswordWithOTP = async (email, otp, newPassword) => {
   users[index].password = await hashPassword(newPassword);
   users[index].updatedAt = new Date().toISOString();
 
-  writeUsers(users);
+  await writeUsers(users);
   otpStore.delete(normEmail);
 
   return { success: true, message: 'Password updated successfully.' };

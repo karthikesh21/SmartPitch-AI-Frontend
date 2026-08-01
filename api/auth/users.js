@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    const users = userStore.getAllUsers();
+    const users = await userStore.getAllUsers();
     return res.status(200).json({ success: true, count: users.length, users });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message || 'Server error' });
