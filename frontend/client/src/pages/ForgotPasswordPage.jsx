@@ -51,7 +51,7 @@ const ForgotPasswordPage = () => {
     try {
       const res = await authAPI.forgotPassword({ email });
       if (res && res.success) {
-        setInfoMessage(res.message || 'OTP code sent to your email address.');
+        setInfoMessage(`📬 OTP verification code sent to ${email}. Please check your email inbox or spam folder.`);
         setStep(2);
       } else {
         setError(extractErrorMsg(res?.error || 'Failed to send OTP.'));
