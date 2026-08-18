@@ -42,42 +42,42 @@ class AIService {
   async generateColdMailPitch({ productName, productDescription, targetRole, problem, valueProposition }) {
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
-      return this.getMockColdMail({ productName, targetRole, problem, valueProposition });
+      return this.getMockColdMail({ productName, productDescription, targetRole, problem, valueProposition });
     }
 
-    const system = `You are an elite B2B sales copywriter. Respond with valid JSON ONLY — no markdown, no code blocks, no extra text outside the JSON object.`;
+    const system = `You are an elite B2B and B2C sales copywriter. Respond with valid JSON ONLY — no markdown, no code blocks, no extra text outside the JSON object. Generate rich, comprehensive, persuasive, and detailed sales copy. Do not provide brief one-liners; expand each section with compelling value propositions, emotional hooks, and concrete details based on the product description.`;
 
-    const user = `Generate 4 sales pitch formats for:
-PRODUCT: ${productName}
-DESCRIPTION: ${productDescription || ""}
-TARGET ROLE: ${targetRole}
-PROBLEM SOLVED: ${problem}
-VALUE PROP: ${valueProposition || ""}
+    const user = `Generate 4 detailed, comprehensive sales pitch formats for:
+PRODUCT NAME: ${productName}
+PRODUCT DESCRIPTION: ${productDescription || ""}
+TARGET AUDIENCE / ROLE: ${targetRole || "Potential Client"}
+PROBLEM SOLVED: ${problem || "Key challenges in this domain"}
+VALUE PROPOSITION: ${valueProposition || productDescription || productName}
 
 Return EXACTLY this JSON (no extra text):
 {
   "email": {
-    "subject": "compelling subject under 50 chars",
-    "intro": "personalized 1-2 sentence opener for ${targetRole}",
-    "body": "Problem → Solution → Value (3-4 sentences)",
-    "cta": "specific low-friction call to action"
+    "subject": "compelling, high-converting email subject line",
+    "intro": "engaging, highly personalized 2-3 sentence opener tailored to recipient needs",
+    "body": "thorough, detailed 2-paragraph sales copy breaking down the problem, the product solution, key features, and tangible value",
+    "cta": "clear, low-friction, persuasive call to action asking for a consultation or demo"
   },
   "linkedin": {
-    "hook": "bold opening line max 15 words",
-    "benefit": "1-3 sentences on tangible benefit for their role",
-    "cta": "soft conversational CTA"
+    "hook": "attention-grabbing opening line highlighting a common pain point",
+    "benefit": "detailed 2-3 sentence value breakdown highlighting why this product/service is superior",
+    "cta": "warm, conversational call to action inviting a quick chat or connection"
   },
   "coldCall": {
-    "opening": "warm confident opener using [Name] placeholder",
-    "problemId": "open-ended question to surface the problem",
-    "pitch": "3-sentence pitch connecting problem to solution",
-    "objection": "empathetic 1-line response to not interested",
-    "closing": "concrete next step ask"
+    "opening": "warm, confident opening dialogue establishing rapport using [Name] placeholder",
+    "problemId": "engaging open-ended discovery question to surface key pain points",
+    "pitch": "detailed 3-4 sentence pitch connecting their specific problem to your product solution",
+    "objection": "empathetic, tactical objection handler for common pushbacks (busy/not interested)",
+    "closing": "concrete, high-converting next-step request"
   },
   "adCopy": {
-    "headline": "punchy headline under 8 words",
-    "body": "3-4 lines: emotional hook, benefit, urgency",
-    "cta": "action button text 3-5 words"
+    "headline": "powerful, high-converting headline capturing key benefit",
+    "body": "rich, detailed, multi-sentence ad copy with emotional hook, unique selling points, and urgency",
+    "cta": "strong action-oriented button copy"
   }
 }`;
 
@@ -90,14 +90,14 @@ Return EXACTLY this JSON (no extra text):
           { role: "user", content: user },
         ],
         temperature: 0.75,
-        max_tokens: 1200,
+        max_tokens: 1500,
         response_format: { type: "json_object" }
       });
 
       return this.parseAIJsonResponse(response.choices[0].message.content);
     } catch (err) {
       console.warn("Groq cold mail fallback:", err.message);
-      return this.getMockColdMail({ productName, targetRole, problem, valueProposition });
+      return this.getMockColdMail({ productName, productDescription, targetRole, problem, valueProposition });
     }
   }
 
@@ -137,32 +137,34 @@ Return EXACTLY this JSON (no extra text):
 **Action:** Get started today and claim your free AI pitch generation credits!`;
   }
 
-  getMockColdMail({ productName, targetRole, problem, valueProposition }) {
-    const pName = productName || "SmartPitch AI";
-    const role = targetRole || "Sales Lead";
+  getMockColdMail({ productName, productDescription, targetRole, problem, valueProposition }) {
+    const pName = productName ? String(productName).trim() : "SmartPitch AI";
+    const pDesc = productDescription ? String(productDescription).trim() : "premium custom services and tailored solutions";
+    const role = targetRole || "valued clients and key decision makers";
+
     return {
       email: {
-        subject: `Transform your sales pipeline with ${pName}`,
-        intro: `Hi [Name], as a ${role}, solving ${problem || 'outreach friction'} is crucial to hit your quarterly growth goals.`,
-        body: `${pName} simplifies pitch generation, enabling teams to personalize cold emails, LinkedIn messages, and call scripts in seconds. ${valueProposition || 'Boost conversions effortlessly.'}`,
-        cta: `Would you be open to a quick 5-minute demo this Thursday?`
+        subject: `Exclusive Tailored Solutions: Transform your results with ${pName}`,
+        intro: `Hi [Name],\n\nFinding custom-crafted solutions that deliver exceptional quality and perfect results can be a challenge. As someone seeking high-caliber ${pDesc}, having a dedicated, expert partner like ${pName} makes all the difference.`,
+        body: `At ${pName}, we specialize in ${pDesc}. Whether you are looking for flawless custom fittings, bespoke solutions, or personalized services, our expert team ensures unparalleled precision, elegance, and satisfaction.\n\nOur client-first process combines premium craftsmanship with modern convenience, guaranteeing a flawless result tailored specifically to your unique preferences. Top clients choose ${pName} for our fast turnaround, meticulous attention to detail, and personalized experience.`,
+        cta: `Would you be open to a quick 10-minute consultation or scheduling your first custom session this week?`
       },
       linkedin: {
-        hook: `Struggling to scale outbound outreach as a ${role}?`,
-        benefit: `${pName} delivers hyper-personalized sales messages designed specifically for your industry targets.`,
-        cta: `Let's connect — happy to send over a sample pitch!`
+        hook: `Looking for top-tier custom quality and perfection with ${pName}?`,
+        benefit: `We provide specialized ${pDesc} designed to give you flawless fit, premium elegance, and personalized attention to detail for every requirement.`,
+        cta: `Let's connect — I'd love to share our exclusive catalog and client offers with you!`
       },
       coldCall: {
-        opening: `Hi [Name], this is Karthik calling regarding ${pName}. Did I catch you at a bad time?`,
-        problemId: `How are you currently handling ${problem || 'outreach workflows'} for your team?`,
-        pitch: `${pName} automates high-converting sales scripts in under 10 seconds, freeing up your reps to focus on closing.`,
-        objection: `I completely understand you're busy. Can I email a 1-minute summary for you to review later?`,
-        closing: `Great, what is the best email to send that to?`
+        opening: `Hi [Name], this is our team from ${pName}. I noticed you're looking for expert solutions in ${pDesc}. Did I catch you at a good time?`,
+        problemId: `How are you currently managing custom requirements or specialized services for your business or personal needs?`,
+        pitch: `${pName} delivers high-precision ${pDesc} with guaranteed perfection, fast turnaround times, and door-to-door personalized service so you achieve your absolute best results.`,
+        objection: `I completely understand you might already have an existing routine. Can I send over a quick 1-page overview showcasing our work for you to review when you have a moment?`,
+        closing: `Awesome! What is the best email address or contact number to send that over to?`
       },
       adCopy: {
-        headline: `Supercharge Your Sales Pitches with AI`,
-        body: `Stop wasting hours drafting cold emails. ${pName} creates high-converting B2B pitches tailored to any role instantly.`,
-        cta: `Start Free Trial Now`
+        headline: `Experience Perfection and Tailored Quality with ${pName}`,
+        body: `Discover premier ${pDesc} tailored specifically to your unique style and needs. At ${pName}, we combine master craftsmanship, top-tier quality, and precision execution to deliver perfection every single time. Don't settle for generic standard offerings when you can experience bespoke quality handcrafted just for you.`,
+        cta: `Book Your Custom Session Today →`
       }
     };
   }
