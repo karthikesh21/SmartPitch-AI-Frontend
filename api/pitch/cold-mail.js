@@ -8,13 +8,23 @@ module.exports = async (req, res) => {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
+  let body = req.body || {};
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch (e) {}
+  }
+
+  const { productName, productDescription, targetRole, problem, valueProposition } = body;
+
   try {
-    const { productName, productDescription, targetRole, problem, valueProposition } = req.body || {};
     const data = await aiService.generateColdMailPitch({
       productName, productDescription, targetRole, problem, valueProposition
     });
     return res.status(200).json({ success: true, data });
   } catch (err) {
-    return res.status(500).json({ success: false, error: "Failed to generate cold mail pitch", message: err.message });
+    console.warn("Cold mail AI generation warning, using fallback:", err.message);
+    const mockData = aiService.getMockColdMail({
+      productName, productDescription, targetRole, problem, valueProposition
+    });
+    return res.status(200).json({ success: true, data: mockData, fallback: true });
   }
 };

@@ -10,6 +10,7 @@
 
 ### 🌐 **Live Web Application & Demo**
 👉 **[Click Here to Open SmartPitch AI Live Demo](https://smart-pitch-ai-frontend-wlr7.vercel.app)**
+🔗 **Short Link**: [http://bit.ly/smartpitch-ai](http://bit.ly/smartpitch-ai)
 
 ---
 

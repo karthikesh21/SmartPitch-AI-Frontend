@@ -1,10 +1,14 @@
 import axios from "axios";
 
-let rawApiUrl = process.env.REACT_APP_API_URL || '';
-if (typeof rawApiUrl === 'string' && rawApiUrl.includes('onrender.com')) {
-  rawApiUrl = ''; // Override stale Render URL to use live Vercel serverless API
-}
-const API_BASE_URL = rawApiUrl ? rawApiUrl.replace(/\/+$/, '').replace(/\/api$/, '') : '';
+export const getSanitizedApiUrl = () => {
+  let rawApiUrl = process.env.REACT_APP_API_URL || '';
+  if (typeof rawApiUrl === 'string' && rawApiUrl.includes('onrender.com')) {
+    rawApiUrl = ''; // Override stale Render URL to use live Vercel serverless API
+  }
+  return rawApiUrl ? rawApiUrl.replace(/\/+$/, '').replace(/\/api$/, '') : '';
+};
+
+const API_BASE_URL = getSanitizedApiUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -23,8 +27,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    console.error("API Error:", error.response || error);
-    return Promise.reject(error.response?.data || error.message);
+    if (error.response && error.response.status >= 500) {
+      console.error("API Server Error:", error.response || error);
+    }
+    return Promise.reject(error.response?.data || error.message || error);
   }
 );
 
@@ -38,6 +44,7 @@ export const authAPI = {
 
 export const pitchAPI = {
   generate: (payload) => api.post("/api/pitch/generate", payload),
+  coldMail: (payload) => api.post("/api/pitch/cold-mail", payload),
   getHistory: () => api.get("/api/pitch/history"),
   deleteHistory: (id) => api.delete(`/api/pitch/history/${id}`),
 };

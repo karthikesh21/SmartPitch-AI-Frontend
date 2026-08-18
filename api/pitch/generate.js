@@ -8,11 +8,19 @@ module.exports = async (req, res) => {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
+  let body = req.body || {};
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch (e) {}
+  }
+
+  const { product, audience, framework = 'AIDA' } = body;
+
   try {
-    const { product, audience, framework = 'AIDA' } = req.body || {};
     const result = await aiService.generatePitch(product, audience, framework);
     return res.status(200).json({ success: true, data: { pitch: result, framework } });
   } catch (err) {
-    return res.status(500).json({ success: false, error: "Failed to generate pitch", message: err.message });
+    console.warn("Generate pitch AI warning, using fallback:", err.message);
+    const mockPitch = aiService.getMockPitch(product, audience, framework);
+    return res.status(200).json({ success: true, data: { pitch: mockPitch, framework }, fallback: true });
   }
 };

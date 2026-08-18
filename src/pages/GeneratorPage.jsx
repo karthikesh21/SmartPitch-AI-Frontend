@@ -2,11 +2,8 @@ import React, { useState, useRef } from 'react';
 import Hyperspeed from '../components/Effects/Hyperspeed';
 import BorderGlow from '../components/Effects/BorderGlow';
 import SplitText from '../components/Effects/SplitText';
+import { pitchAPI } from '../services/api';
 import './GeneratorPage.css';
-
-const rawApiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-const API_BASE_URL = rawApiUrl.replace(/\/+$/, '').replace(/\/api$/, '');
-const API = `${API_BASE_URL}/api/pitch/cold-mail`;
 
 const MailIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
@@ -181,28 +178,23 @@ const GeneratorPage = () => {
     setError('');
     setResult(null);
     try {
-      const res = await fetch(API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productName: form.serviceName,
-          productDescription: form.description,
-          targetRole: 'potential clients and decision makers',
-          problem: `Challenges related to ${form.serviceName}`,
-          valueProposition: form.description || form.serviceName,
-        }),
+      const res = await pitchAPI.coldMail({
+        productName: form.serviceName,
+        productDescription: form.description,
+        targetRole: 'potential clients and decision makers',
+        problem: `Challenges related to ${form.serviceName}`,
+        valueProposition: form.description || form.serviceName,
       });
-      const json = await res.json();
-      if (!json.success) throw new Error(json.errors?.[0]?.msg || json.error || 'API error');
-      setResult(json.data);
+      if (!res || !res.success) throw new Error(res?.error || 'API error');
+      setResult(res.data);
 
-      const item = { id: Date.now(), type: typeId, ...form, data: json.data, timestamp: new Date().toISOString() };
+      const item = { id: Date.now(), type: typeId, ...form, data: res.data, timestamp: new Date().toISOString() };
       const next = [item, ...history].slice(0, 10);
       setHistory(next);
       localStorage.setItem('pitchHistory', JSON.stringify(next));
 
       setTimeout(() => outputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-    } catch (e) { setError(e.message); }
+    } catch (e) { setError(e.error || e.message || 'Failed to generate pitch'); }
     finally { setLoading(false); }
   };
 
